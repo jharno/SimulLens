@@ -1,0 +1,247 @@
+
+#FC=gfortran
+FC=ifort
+
+##########
+#stacpolly
+##########
+
+FFTWLIB=/usr/lib/
+FFTWINC=/usr/include/
+LDLIBS= -lfftw3f -lfftw3f_threads -lm -ldl
+
+########
+# jade
+########
+
+#FFTWLIB=/usr/lib/
+#FFTWINC=/usr/include/
+#LDLIBS= -lfftw3f -lfftw3f_threads -lm -ldl
+
+#Common
+LDPATH= -L $(FFTWLIB) 
+INCLUDE= -I$(FFTWINC) 
+
+
+###############
+# For SimulLens :  ***** NOTE : Due to a memory leak, one cannot run both shear and convergence at the same time.
+#                  *****        Therefore, one should run kappa first (with delta, that is fine...) with 'write_shift = 1'
+###############    *****        Then run cal_shear w/o kappa and gamma, with 'read_shift = 1' instead. Cal_shear supports -O1 max.
+
+#kappa, delta  and power spectrum. Watch out for overwriting the random offsets...
+#FFLAGS = $(INCLUDE)  -O3 -fpp -g -parallel -i_dynamic -mcmodel=medium -Dcubepm -Dz_slices -Dwrite_kappa -Dfull_geometry -Dwrite_delta_maps -DOPENMP -Dpower_spectrum -DOMP -DfR #-Dmix_nbody_runs
+
+#shear
+#FFLAGS = $(INCLUDE)  -O1  -fpp -fpe0 -g -parallel -i_dynamic -mcmodel=medium -Dcubepm -Dz_slices -Dfull_geometry -Dcalshear -DOMP #ifort
+#FFLAGS = $(INCLUDE) -cpp -O3  -ffree-line-length-none -Wall  -Dgfort -mcmodel=medium -Dcubepm -Dz_slices -Dfull_geometry -Dcalshear -DOMP -DSLICS -Dmix_nbody_runs #-DNEUTRINOS #gfortran
+#FFLAGS = $(INCLUDE) -cpp -O3 -fopenmp  -ffree-line-length-none -Wall  -Dgfort -mcmodel=large -Dcubepm -Dz_slices -Dfull_geometry -Dcalshear -DOMP -DcosmoSLICS #-DNEUTRINOS #gfortran
+#FFLAGS = $(INCLUDE)  -O0 -fpp -g -parallel -i_dynamic -mcmodel=medium -Dcubepm -Dz_slices -Dfull_geometry -DOPENMP -Dcalshear -DOMP -DfR #-Dmix_nbody_runs
+
+
+#delta only
+#FFLAGS = $(INCLUDE) -O1 -CB -fpp -fpe0 -parallel -i_dynamic -mcmodel=medium -Dcubepm -Dz_slices -Dwrite_delta_maps -DOPENMP
+#FFLAGS = $(INCLUDE) -cpp -O0 -ffree-line-length-none -Wall  -Dgfort -mcmodel=medium -Dcubepm -Dz_slices -Dwrite_delta_maps -DOPENMP  #gfortran
+
+#MapsNz. 
+FFLAGS = $(INCLUDE)  -O3 -fpp -g -parallel -i_dynamic -mcmodel=medium -Dread_delta -Dwrite_kappa -Dpower_spectrum -DOMP
+
+#kappa power, no map
+#FFLAGS = $(INCLUDE)  -O1  -fpp -parallel -i_dynamic -mcmodel=medium -Dcubepm -Dz_slices  -Dfull_geometry -DOPENMP -Dpower_spectrum -DOMP
+#FFLAGS = $(INCLUDE) -cpp -O3 -ffree-line-length-none -Wall  -Dgfort -mcmodel=medium -Dcubepm -Dz_slices -Dfull_geometry -Dpower_spectrum -DOPENMP  -DOMP -DcosmoSLICS #gfortran
+
+#kappamap only
+#FFLAGS = $(INCLUDE)  -O1  -fpp -parallel -i_dynamic -mcmodel=medium -Dcubepm -Dz_slices  -Dfull_geometry -DOPENMP -Dpower_spectrum -DOMP
+#FFLAGS = $(INCLUDE) -cpp -O0 -ffree-line-length-none -Wall  -Dgfort -mcmodel=medium -Dcubepm -Dz_slices -Dfull_geometry -Dwrite_kappa -DOPENMP  -DOMP -DSLICS #gfortran
+
+#halo with sort
+#FFLAGS = $(INCLUDE)  -O1  -fpp -fpe0 -g -parallel -i_dynamic -mcmodel=medium -Dcubepm -Dz_slices  -DHALO_CATALOGUE -Dhalo_only -DSORT_HALO -DcosmoSLICS# -Ddebug_halo_intense
+#FFLAGS = $(INCLUDE) -g -cpp -O0 -ffree-line-length-none -Wall  -fbounds-check  -Dgfort -mcmodel=medium -Dcubepm -Dz_slices  -DHALO_CATALOGUE -Dhalo_only -DSORT_HALO -DcosmoSLICS #-Ddebug_halo_intense # gfortran
+#FFLAGS = $(INCLUDE) -g -cpp -O0 -ffree-line-length-none -Wall  -fbounds-check  -Dgfort -mcmodel=medium -Dcubepm -Dz_slices  -DHALO_CATALOGUE -Dhalo_only -DSORT_HALO -DSLICS  -Dmix_nbody_runs  #-Ddebug_halo_intense # gfortran
+#FFLAGS = $(INCLUDE) -CB -fpp -O1 -fpe0 -parallel -i_dynamic -mcmodel=medium -Dcubepm -Dz_slices  -DHALO_CATALOGUE -Dhalo_only  -DSLICS  -Dmix_nbody_runs  #-Ddebug_halo_intense # gfortran
+
+#halo with sort and correupted fix
+#FFLAGS = $(INCLUDE)  -O1  -fpp -fpe0 -g -parallel -i_dynamic -mcmodel=medium -Dcubepm -Dz_slices  -DHALO_CATALOGUE -Dhalo_only -DSORT_HALO -DHALO_PATCH_CORRUPTED_FILES # -Ddebug_halo_intense
+#FFLAGS = $(INCLUDE) -cpp -O0 -ffree-line-length-none -Wall  -Dgfort -mcmodel=medium -Dcubepm -Dz_slices  -DHALO_CATALOGUE -Dhalo_only -DSORT_HALO -DHALO_PATCH_CORRUPTED_FILES # gfortran
+
+#halo
+#FFLAGS = $(INCLUDE)  -O1  -fpp -fpe0 -g -parallel -i_dynamic -mcmodel=medium -Dcubepm -Dz_slices  -DHALO_CATALOGUE -Dhalo_only# -Ddebug_halo_intense
+
+#halo patch corrupted files
+#FFLAGS = $(INCLUDE)  -O1  -fpp -fpe0 -g -parallel -i_dynamic -mcmodel=medium -Dcubepm -Dz_slices  -DHALO_CATALOGUE -Dhalo_only -DHALO_PATCH_CORRUPTED_FILES # -Ddebug_halo_intense
+
+#estimators
+#FFLAGS = $(INCLUDE)  -O1  -fpp -fpe0 -g -parallel -i_dynamic -mcmodel=medium -DOMP
+
+#shear and defl
+#FFLAGS = $(INCLUDE)  -O1  -fpp -fpe0 -g -parallel -i_dynamic -mcmodel=medium -Dcubepm -Dz_slices  -Dfull_geometry -Dcalshear -DOMP -Dwrite_defl
+
+#kappa
+#FFLAGS = $(INCLUDE)  -O1  -fpp -fpe0 -parallel -i_dynamic -mcmodel=medium -Dcubepm -Dz_slices -Dwrite_kappa -Dfull_geometry -DOPENMP
+
+#kappa and power
+#FFLAGS = $(INCLUDE)  -O1  -fpp -parallel -i_dynamic -mcmodel=medium -Dcubepm -Dz_slices -Dwrite_kappa -Dfull_geometry -DOPENMP -Dpower_spectrum -DOMP
+#FFLAGS = $(INCLUDE) -cpp -O0 -ffree-line-length-none -Wall  -Dgfort -mcmodel=medium -Dcubepm -Dz_slices -Dwrite_kappa -Dfull_geometry -Dpower_spectrum -DOPENMP  -DOMP #gfortran
+
+#kappa and delta. Watch out for overwriting the random offsets...
+#FFLAGS = $(INCLUDE)  -O1 -fpp -g -parallel -i_dynamic -mcmodel=medium -Dcubepm -Dz_slices -Dwrite_kappa -Dfull_geometry -Dwrite_delta_maps -DOPENMP
+
+
+
+#kappa and delta and shear !! Bugged so far!
+#FFLAGS = $(INCLUDE)  -O0 -CB -fpp -fpe0 -parallel -i_dynamic -mcmodel=medium -Dcubepm -Dz_slices -Dwrite_kappa -Dfull_geometry -Dwrite_delta_maps -Dcalshear -DOPENMP
+
+#powerspectrum
+#FFLAGS = $(INCLUDE)  -O3 -fpp -fpe0 -parallel -i_dynamic -mcmodel=medium -Dcubepm -Dz_slices -Dfull_geometry -Dpower_spectrum  -DOMP
+
+#QuickPower
+#FFLAGS = $(INCLUDE)  -O3 -fpp -fpe0 -parallel -i_dynamic -mcmodel=medium -DOMP -Dcubepm # ifort
+#FFLAGS = $(INCLUDE) -cpp -O3 -ffree-line-length-none -Wall  -Dgfort -mcmodel=medium  -DOMP  #gfort
+
+#GaussPower. 
+#FFLAGS = $(INCLUDE)  -O0 -CB -fpe0 -fpp -g -parallel -i_dynamic -mcmodel=medium -DOMP
+
+#all
+#FFLAGS = $(INCLUDE) -O0 -CB -fpp -fpe0 -parallel -i_dynamic -mcmodel=medium  -Dcubepm -Dz_slices -Dwrite_delta_maps -Dwrite_kappa -Dcalshear -Dfull_geometry -Dintegrate -DOPENMP
+
+#GetSortIDLightCone
+#FFLAGS = $(INCLUDE)  -O0 -CB -fpp -fpe0 #-parallel -i_dynamic -mcmodel=medium 
+
+# other usefull flags:
+# -Dmix_nbody_runs,-DHALO_CATALOGUE,-Dhalo_only, -Dintegrate,-Dpower_spectrum,-Ddebug_halo_intense,-Ddebug_project,-Ddebug_cic
+
+
+objects = spline.o splint.o Conv.o FFT.o PWS.o GaussRandomField.o InterP.o Chi.o  Lensing.o IndexShell.o  StringOpt.o Euler.o indexedsort_PID.o InverseChi.o  indexedsort.o Chi_wde.o
+objects_sort =  StringOpt.o indexedsort.o #sort_alt.o 
+objects_MapsNz = spline.o splint.o Conv.o FFT.o PWS.o Chi.o Chi_wde_parallel.o
+
+#incfile = par.fh 
+
+default: SimulLens
+
+SimulLens: source/SimulLens_2boxes_New.f90 $(objects)
+	$(FC) $(FFLAGS) source/SimulLens_2boxes_New.f90 $(objects) $(LDPATH) $(LDLIBS)  -o SimulLens
+#SimulLens: source/SimulLens_TCS_2boxes.f90 $(objects)
+#	$(FC) $(FFLAGS) source/SimulLens_TCS_2boxes.f90 $(objects) $(LDPATH) $(LDLIBS)  -o SimulLens
+#SimulLens: source/SimulLens.f90 $(objects)
+#	$(FC) $(FFLAGS) source/SimulLens.f90 $(objects) $(LDPATH) $(LDLIBS)  -o SimulLens
+GetSortIDLightCone: source/GetSortIDLightCone.f90 $(objects_sort)
+	$(FC) $(FFLAGS) source/GetSortIDLightCone.f90 $(objects_sort) $(LDPATH) $(LDLIBS)  -o GetSortIDLightCone
+Estimators: source/Estimators.f90 $(objects)
+	$(FC) $(FFLAGS) source/Estimators.f90 $(objects) $(LDPATH) $(LDLIBS)  -o Estimators
+RayTracing: source/RayTracing.f90 $(objects)
+	$(FC) $(FFLAGS) source/RayTracing.f90 $(objects) $(LDPATH) $(LDLIBS) -o RayTracing
+FullCMBLens: source/FullCMBLens.f90 $(objects)
+	$(FC) $(FFLAGS) source/FullCMBLens.f90 $(objects) $(LDPATH) $(LDLIBS) -o FullCMBLens
+#cicpow: source/cicpow.f90 $(objects) 
+#	$(FC) $(FFLAGS) source/cicpow.f90 $(objects) $(LDPATH) $(LDLIBS) -o cicpow    
+AngularCovariance: source/AngularCovariance_loop.f90 $(objects) 
+	$(FC) $(FFLAGS) source/AngularCovariance_loop.f90 $(objects) $(LDPATH) $(LDLIBS)  -o AngularCovariance    
+PID_ANALYSIS: source/PID_analysis.f90 $(objects)
+	$(FC) $(FFLAGS) source/PID_analysis.f90 $(objects) $(LDPATH) $(LDLIBS) -o PID_ANALYSIS    
+CMBLens: source/CMBLens.f90 $(objects) 
+	$(FC) $(FFLAGS) source/CMBLens.f90 $(objects) $(LDPATH) $(LDLIBS) -o CMBLens    
+CrossPower: source/crosspower_spectrum.f90 $(objects) 
+	$(FC) $(FFLAGS) source/crosspower_spectrum.f90 $(objects) $(LDPATH) $(LDLIBS) -o CrossPower    
+Xi: source/MassAutocorrelation.f90 $(objects) 
+	$(FC) $(FFLAGS) source/MassAutocorrelation.f90 $(objects) $(LDPATH) $(LDLIBS) -o Xi    
+projection: source/projection.f90 
+	$(FC) $(FFLAGS) source/projection.f90 -o projection
+subcell_projection: source/subcell_projection.f90
+	$(FC) $(FFLAGS) source/subcell_projection.f90  -o subcell_projection
+Power: source/power_spectrum.f90 $(objects)
+	$(FC) $(FFLAGS) source/power_spectrum.f90 $(objects) $(LDPATH) $(LDLIBS) -o Power
+Mapper: source/Mapper.f90 $(objects)
+	$(FC) $(FFLAGS) source/Mapper.f90 $(objects) $(LDPATH) $(LDLIBS) -o Mapper
+MapsNz: source/MapsNz.f90 $(objects_MapsNz)
+	$(FC) $(FFLAGS) source/MapsNz.f90 $(objects_MapsNz) $(LDPATH) $(LDLIBS) -o MapsNz
+MapsCMBLenS: source/MapsCMBLenS.f90 $(objects)
+	$(FC) $(FFLAGS) source/MapsCMBLenS.f90 $(objects) $(LDPATH) $(LDLIBS) -o MapsCMBLenS
+QuickPower: source/QuickPower.f90 $(objects)
+	$(FC) $(FFLAGS) source/QuickPower.f90 $(objects) $(LDPATH) $(LDLIBS) -o QuickPower
+CrossCorrMaps: source/CrossCorrelateMaps.f90 $(objects)
+	$(FC) $(FFLAGS) source/CrossCorrelateMaps.f90 $(objects) $(LDPATH) $(LDLIBS) -o CrossCorrMaps
+GaussPower: source/GaussPower.f90 $(objects)
+	$(FC) $(FFLAGS) source/GaussPower.f90 $(objects) $(LDPATH) $(LDLIBS) -o GaussPower
+##############
+
+Lensing.o : source/JoLib/Lensing.f90
+	$(FC) $(FFLAGS) -c source/JoLib/Lensing.f90 $(LDPATH) $(LDLIBS)
+#	$(FC) $(FFLAGS) -fopenmp  -c source/JoLib/Lensing.f90 $(LDPATH) $(LDLIBS)
+
+spline.o : source/NRLib/spline.f90
+	$(FC) $(FFLAGS) -c source/NRLib/spline.f90
+
+splint.o : source/NRLib/splint.f90
+	$(FC) $(FFLAGS) -c source/NRLib/splint.f90
+
+Conv.o : source/JoLib/Conv.f90
+	$(FC) $(FFLAGS) -c source/JoLib/Conv.f90 $(LDPATH) $(LDLIBS)
+#	$(FC) $(FFLAGS) -DOMP -openmp -c source/JoLib/Conv.f90 $(LDPATH) $(LDLIBS)
+
+
+FFT.o : source/JoLib/FFT.f90
+	$(FC) $(FFLAGS) -c source/JoLib/FFT.f90 $(LDPATH) $(LDLIBS)      
+	#$(FC) $(FFLAGS) -DOMP -openmp -c source/JoLib/FFT.f90 $(LDPATH) $(LDLIBS)
+
+PWS.o : source/JoLib/PWS.f90 
+	$(FC) $(FFLAGS) -c source/JoLib/PWS.f90  $(LDPATH) $(LDLIBS)
+
+GaussRandomField.o : source/JoLib/GaussRandomField.f90 FFT.o
+	$(FC) $(FFLAGS) -c source/JoLib/GaussRandomField.f90 FFT.o
+
+
+Chi.o : source/JoLib/Chi.f90
+	$(FC) $(FFLAGS) -c source/JoLib/Chi.f90     
+
+Euler.o : source/JoLib/Euler.f90
+	$(FC) $(FFLAGS) -c source/JoLib/Euler.f90     
+
+InterP.o : source/JoLib/InterP.f90
+	$(FC) $(FFLAGS) -c source/JoLib/InterP.f90     
+
+StringOpt.o : source/JoLib/StringOpt.f90
+	$(FC) $(FFLAGS) -c source/JoLib/StringOpt.f90
+
+IndexShell.o : source/JoLib/IndexShell.f90
+	$(FC) $(FFLAGS) -c source/JoLib/IndexShell.f90
+
+indexedsort.o: source/JoLib/indexedsort.f90
+	$(FC) $(FFLAGS)  -c $<
+
+sort_alt.o: source/JoLib/sort_alt.f90
+	$(FC) $(FFLAGS)  -c $<
+
+indexedsort_PID.o: source/JoLib/indexedsort_PID.f90
+	$(FC) $(FFLAGS) -c $<
+
+InverseChi.o: source/JoLib/InverseChi.f90
+	$(FC) $(FFLAGS) -c source/JoLib/InverseChi.f90 
+
+Chi_wde.o: source/JoLib/Chi_wde.f90
+	$(FC) $(FFLAGS) -c source/JoLib/Chi_wde.f90
+
+Chi_wde_parallel.o: source/JoLib/Chi_wde_parallel.f90
+	$(FC) $(FFLAGS) -c source/JoLib/Chi_wde_parallel.f90
+
+#nrecip.o: ../PopulateHalos/nrecip.f
+#	$(FC) $(FFLAGS) -c ../PopulateHalos/nrecip.f
+
+#crosspower.o : source/crosspower_spectrum.f90
+#	$(FC) $(FFLAGS) -c -openmp source/crosspower_spectrum.f90 $(LDLIBS)
+
+
+.PHONY: clean 
+clean:
+	rm -f  $(objects) SimulLens CMBLens AngularCovariance*  *.mod
+
+tar_kappa:
+	tar -cvjf ../data/Lensing/LOS1/zs_3_120Mpc_1024/kappa.tar.bz2   ../data/Lensing/LOS1/zs_3_120Mpc_1024/kappa_z*
+
+tar_gamma1:
+	tar -cvjf ../data/Lensing/LOS1/zs_3_120Mpc_1024/gamma1.tar.bz2  ../data/Lensing/LOS1/zs_3_120Mpc_1024/gamma1_z*
+
+tar_gamma2:
+	tar -cvjf ../data/Lensing/LOS1/zs_3_120Mpc_1024/gamma2.tar.bz2  ../data/Lensing/LOS1/zs_3_120Mpc_1024/gamma2_z*
+
+tar_halo:
+	tar -cvjf ../data/Lensing/LOS1/zs_3_120Mpc_1024/halo.tar.bz2    ../data/Lensing/LOS1/zs_3_120Mpc_1024/*halo*

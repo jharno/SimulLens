@@ -1,0 +1,96 @@
+!! cosmological parameters 
+  
+real, parameter :: omegav=0.7095 !0.721
+real, parameter :: omegam=1-omegav
+real, parameter :: h=0.6898 !0.701
+real, parameter :: lbox=505.0/8  !147 !! length of lensing simulation box
+real, parameter :: z3dps=0.042 !0.025!0.957 !1.0
+
+!! simulation parameters
+!! nc is the number of grids for the simulation box
+!! nn is the number of nodes
+
+integer, parameter :: nc=768 !2048 !1728 !512  !! Important for JO
+integer, parameter :: nodes_dim=1! 2!3 !2 !3  
+integer, parameter :: nn=nodes_dim**3
+integer, parameter :: hc=nc/2
+
+
+!! I/O PATH and files 
+
+
+character(*), parameter :: proj_path='/data/jharno/'! '/scratch/jharno/Lensing_2048/LOS' !
+!character(*), parameter :: proj_path='/mnt/scratch-3week/jharno/PID2/'
+!character(*), parameter :: proj_path='/cita/scratch/mole/jharno/cubep3m_V'
+character(*), parameter :: RedShift='z0042' !ten times higher ex. z10 means z = 1.0
+character(*), parameter :: Z='0.042'
+character(*), parameter :: Run='1'
+character(*), parameter :: Version='1' !cubep7m code version
+
+character(*), parameter :: dir_work='/data/jharno/'!'/cita/h/home-1/jharno/Projects/power_spectrum/data/'
+!character(*), parameter :: PS_dir='/mnt/scratch-3week/jharno/AngularCovariance/data/PowerSpectrum/'!'/cita/h/home-1/jharno/Projects/power_spectrum/data/PowerSpectrum/'
+!character(*), parameter :: CrossCorr_dir='/mnt/scratch-3week/jharno/AngularCovariance/data/CrossCorrelation/'!'/cita/h/home-1/jharno/Projects/power_spectrum/data/CrossCorrelation/'
+!character(*), parameter :: Test_dir='/cita/h/home-1/jharno/Projects/power_spectrum/data/test/'
+character(*), parameter :: PS_dir=dir_work
+character(*), parameter :: Test_dir=dir_work
+
+! Specify shell properties for Cross-Correlation
+
+!real, parameter :: MAX_Inner = 32.
+!real, parameter :: MAX_Outer = 32.
+!character(*), parameter :: MAX_Inner_char = '32'
+!character(*), parameter :: MAX_Outer_char = '32'
+!real, parameter :: Thickness_Inner = 1.
+!real, parameter :: Thickness_Outer = 1.
+
+! Choose simulation code
+
+!#define cubepm
+!#define pmfast 
+!#define IC
+
+
+
+! Choose Statistics
+!#define RANDOM
+!#define poisson
+!#define GAUSS
+
+! Choose tests
+!#define LegendreTest
+!#define FFT_TEST
+!#define TEST
+!#define subsample
+
+! debugs
+
+!#define debug
+!#define debug_shell
+!#define debug_xi
+!#define debug_PSFromFile
+!#define kr2debug
+
+! Turn on Redshift Distortions
+!#define Kaiser
+
+!Enable Angular Covariance
+!#define AngularCovariance
+
+!Compute only Power Spectrum of Shells
+!#define GetPowerShells
+!#define OverwritePower
+
+!#define kr2Bining
+!#define NGP_PS
+
+!#define MNT_SCRATCH
+
+!#define HALO
+!#define shotnoise
+!#define MERGED_LIST
+
+!#define GETPID
+!#define HALOPID
+!#define power_law
+
+!#define dump_density
