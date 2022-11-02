@@ -1,14 +1,14 @@
 
-#FC=gfortran
-FC=ifort
+FC=gfortran
+#FC=ifort
 
 ##########
 #stacpolly
 ##########
 
-FFTWLIB=/usr/lib/
-FFTWINC=/usr/include/
-LDLIBS= -lfftw3f -lfftw3f_threads -lm -ldl
+FFTWLIB=/home/jharno/data/lib/lib/
+FFTWINC=/home/jharno/data/lib/include/
+LDLIBS= -lfftw3f -lfftw3f_threads -pthread -lm -ldl -lrt
 
 ########
 # jade
@@ -30,6 +30,7 @@ INCLUDE= -I$(FFTWINC)
 
 #kappa, delta  and power spectrum. Watch out for overwriting the random offsets...
 #FFLAGS = $(INCLUDE)  -O3 -fpp -g -parallel -i_dynamic -mcmodel=medium -Dcubepm -Dz_slices -Dwrite_kappa -Dfull_geometry -Dwrite_delta_maps -DOPENMP -Dpower_spectrum -DOMP -DfR #-Dmix_nbody_runs
+FFLAGS = $(INCLUDE)  -cpp -O0 -ffree-line-length-none -Wall  -Dgfort -mcmodel=medium  -Dcubepm -Dz_slices -Dwrite_kappa -Dfull_geometry -Dwrite_delta_maps -DOPENMP -Dpower_spectrum -DOMP -DfR #-Dmix_nbody_runs
 
 #shear
 #FFLAGS = $(INCLUDE)  -O1  -fpp -fpe0 -g -parallel -i_dynamic -mcmodel=medium -Dcubepm -Dz_slices -Dfull_geometry -Dcalshear -DOMP #ifort
@@ -43,7 +44,7 @@ INCLUDE= -I$(FFTWINC)
 #FFLAGS = $(INCLUDE) -cpp -O0 -ffree-line-length-none -Wall  -Dgfort -mcmodel=medium -Dcubepm -Dz_slices -Dwrite_delta_maps -DOPENMP  #gfortran
 
 #MapsNz. 
-FFLAGS = $(INCLUDE)  -O3 -fpp -g -parallel -i_dynamic -mcmodel=medium -Dread_delta -Dwrite_kappa -Dpower_spectrum -DOMP
+#FFLAGS = $(INCLUDE)  -O3 -fpp -g -parallel -i_dynamic -mcmodel=medium -Dread_delta -Dwrite_kappa -Dpower_spectrum -DOMP
 
 #kappa power, no map
 #FFLAGS = $(INCLUDE)  -O1  -fpp -parallel -i_dynamic -mcmodel=medium -Dcubepm -Dz_slices  -Dfull_geometry -DOPENMP -Dpower_spectrum -DOMP

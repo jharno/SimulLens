@@ -112,7 +112,7 @@ program SimulLens
 
   ! Other stuff
   real, dimension(npc) :: power
-  real, dimension(nslice) :: z_write,z_write_s, z_true
+  real, dimension(nslice) :: z_write,z_write_s
   integer, dimension(nslice) :: snap
   type(vec2D) shift, mesh_shift
   integer i,j,k,fu,i1,j1,j2,i3,icount,kx,ky,ir,index_nbody_run,file_status , newLOS,patch, first_random_call, stat
@@ -201,8 +201,8 @@ program SimulLens
 #ifdef write_kappa
   integer, parameter ::  write_shift = 0 ! Mead, fergus, cosmoSLICS, exception
   integer, parameter ::  read_shift = 1!  ! Mead, fergus, cosmoSLICS, exception
-  !integer, parameter ::  write_shift = 1 ! KiDS, recycle
-  !integer, parameter ::  read_shift = 0  ! KiDS, recycle 
+  !integer, parameter ::  write_shift = 1 ! KiDS, recycle, first pass at cosmoSLICS
+  !integer, parameter ::  read_shift = 0  ! KiDS, recycle first pass at cosmoSLICS
 
   !-------
   ! for mix_nbody_runs
@@ -345,11 +345,10 @@ program SimulLens
   !read z-lens
   open(11,file=fn_z)  
   do i=1,nslice
-     read(11,*) z_write(i), z_true(i), snap(i) 
+     read(11,*) z_write(i), snap(i) 
   enddo
   close(11)
   write(*,*)'z_lens = ', z_write
-  write(*,*)'z_true = ', z_true
   write(*,*)'snap = ', snap
 
   ! This following source table has been replaced by a calculation of the natural source.
@@ -373,7 +372,7 @@ program SimulLens
   first_random_call = 1
   !do ir=1,nr
   if(nr > 1) then
-    write(*,*) 'Computing Lens', ir , 'out of', nr
+    write(*,*) 'Computing Lens up to', nr
     call GetArg(2,nr_min_str); read(nr_min_str,*,iostat=stat) nr_min
     call GetArg(3,nr_max_str); read(nr_max_str,*,iostat=stat) nr_max 
     write(*,*)'computing multiple cones with nr in range ', nr_min, nr_max
@@ -651,7 +650,8 @@ program SimulLens
         if (nr>1) then
 
            if(write_shift.eq.1) then
-              call random_number(rand_subvol)
+              !call random_number(rand_subvol)
+              rand_subvol = 0.1
            else     
               if(nr>1.and. ir<10)then
                   write (fn1,'("_cone", i1)') ir
@@ -675,22 +675,46 @@ program SimulLens
 
            if(rand_subvol<(1.0/6.0)) then 
               !fp=fn(1:len_trim(fn))//'proj_half_finer_xy_f.dat'
-              fp=fn(1:len_trim(fn))//'projection_xy_f_snap_'//trim(z_string)//'_Seed_'//trim(seed_fr)//'_Node_'//trim(nodeID)//'.unf'
+              !fp=fn(1:len_trim(fn))//'projection_xy_f_snap_'//trim(z_string)//'_Seed_'//trim(seed_fr)//'_Node_'//trim(nodeID)//'.unf'
+              !fp=fn(1:len_trim(fn))//'projection_xy_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_hr.unf'
+              !fp=fn(1:len_trim(fn))//'projection_xy_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_2.unf'
+              !fp=fn(1:len_trim(fn))//'projection_xy_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_4.unf'
+              fp=fn(1:len_trim(fn))//'projection_xy_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'.unf'
            elseif(rand_subvol<(2.0/6.0)) then
               !fp=fn(1:len_trim(fn))//'proj_half_finer_yz_f.dat'
-              fp=fn(1:len_trim(fn))//'projection_yz_f_snap_'//trim(z_string)//'_Seed_'//trim(seed_fr)//'_Node_'//trim(nodeID)//'.unf' 
+              !fp=fn(1:len_trim(fn))//'projection_yz_f_snap_'//trim(z_string)//'_Seed_'//trim(seed_fr)//'_Node_'//trim(nodeID)//'.unf' 
+              !fp=fn(1:len_trim(fn))//'projection_yz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_hr.unf' 
+              !fp=fn(1:len_trim(fn))//'projection_yz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_2.unf' 
+              !fp=fn(1:len_trim(fn))//'projection_yz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_4.unf' 
+              fp=fn(1:len_trim(fn))//'projection_yz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'.unf' 
            elseif(rand_subvol<(3.0/6.0)) then 
               !fp=fn(1:len_trim(fn))//'proj_half_finer_xz_f.dat'
-              fp=fn(1:len_trim(fn))//'projection_xz_f_snap_'//trim(z_string)//'_Seed_'//trim(seed_fr)//'_Node_'//trim(nodeID)//'.unf'
+              !fp=fn(1:len_trim(fn))//'projection_xz_f_snap_'//trim(z_string)//'_Seed_'//trim(seed_fr)//'_Node_'//trim(nodeID)//'.unf'
+              !fp=fn(1:len_trim(fn))//'projection_xz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_hr.unf'
+              !fp=fn(1:len_trim(fn))//'projection_xz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_2.unf'
+              !fp=fn(1:len_trim(fn))//'projection_xz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_4.unf'
+              fp=fn(1:len_trim(fn))//'projection_xz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'.unf'
            elseif(rand_subvol<(4.0/6.0)) then 
               !fp=fn(1:len_trim(fn))//'proj_half_finer_xy_b.dat'
-              fp=fn(1:len_trim(fn))//'projection_xy_b_snap_'//trim(z_string)//'_Seed_'//trim(seed_fr)//'_Node_'//trim(nodeID)//'.unf'
+              !fp=fn(1:len_trim(fn))//'projection_xy_b_snap_'//trim(z_string)//'_Seed_'//trim(seed_fr)//'_Node_'//trim(nodeID)//'.unf'
+              !fp=fn(1:len_trim(fn))//'projection_xy_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_hr.unf'
+              !fp=fn(1:len_trim(fn))//'projection_xy_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_2.unf'
+              !fp=fn(1:len_trim(fn))//'projection_xy_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_4.unf'
+              fp=fn(1:len_trim(fn))//'projection_xy_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'.unf'
            elseif(rand_subvol<(5.0/6.0)) then
               !fp=fn(1:len_trim(fn))//'proj_half_finer_yz_b.dat'
-              fp=fn(1:len_trim(fn))//'projection_yz_b_snap_'//trim(z_string)//'_Seed_'//trim(seed_fr)//'_Node_'//trim(nodeID)//'.unf'
+              !fp=fn(1:len_trim(fn))//'projection_yz_b_snap_'//trim(z_string)//'_Seed_'//trim(seed_fr)//'_Node_'//trim(nodeID)//'.unf'
+              !fp=fn(1:len_trim(fn))//'projection_yz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_hr.unf'
+              !fp=fn(1:len_trim(fn))//'projection_yz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_2.unf'
+              !fp=fn(1:len_trim(fn))//'projection_yz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_4.unf'
+              fp=fn(1:len_trim(fn))//'projection_yz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'.unf'
            else
               !fp=fn(1:len_trim(fn))//'proj_half_finer_xz_b.dat'
-              fp=fn(1:len_trim(fn))//'projection_xz_b_snap_'//trim(z_string)//'_Seed_'//trim(seed_fr)//'_Node_'//trim(nodeID)//'.unf'
+              !fp=fn(1:len_trim(fn))//'projection_xz_b_snap_'//trim(z_string)//'_Seed_'//trim(seed_fr)//'_Node_'//trim(nodeID)//'.unf'
+              !fp=fn(1:len_trim(fn))//'projection_xz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_hr.unf'
+              !fp=fn(1:len_trim(fn))//'projection_xz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_2.unf'
+              !fp=fn(1:len_trim(fn))//'projection_xz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_4.unf'
+              fp=fn(1:len_trim(fn))//'projection_xz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'.unf'
            endif
         else
            write (fn1,'("_cone", i1)') 1
@@ -2684,6 +2708,9 @@ program SimulLens
      !write (fn,'(f5.3,"l2cl_kappa_ngp_new.dat_LOS")') z_write(i)
      !write (fn,'(f5.3,"l2cl_kappa_ngp_manual.dat_LOS")') z_write(i)
      !write (fn,'(f8.3,"l2cl_kappa_ngp.dat_LOS")') z_write(i)
+     !write (fn,'(f5.3,"l2cl_kappa_ngp_4096_hr.dat_LOS")') z_write(i)
+     !write (fn,'(f5.3,"l2cl_kappa_ngp_4096_2.dat_LOS")') z_write(i)
+     !write (fn,'(f5.3,"l2cl_kappa_ngp_4096_4.dat_LOS")') z_write(i)
      write (fn,'(f5.3,"l2cl_kappa_ngp.dat_LOS")') z_write(i)
      !write (fn,'(f5.3,"l2cl_kappa.dat_LOS")') z_write(i)
      !!write (fn,'(f5.3,"l2cl_gamma1.dat_LOS")') z_write(i)

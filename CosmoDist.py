@@ -49,6 +49,6 @@ chi_Mpc_over_h = cosmo.comoving_distance(z)*cosmo.h
 
 file_out_str= "./chi_from_python.tmp"
 data = [chi_Mpc_over_h.value, Om_m, Om_l, w_de, h_0, z]
-#print(data)
+#print('data:',data)
 np.savetxt(file_out_str,data, fmt='%.8e')
 

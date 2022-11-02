@@ -1,0 +1,59 @@
+!! cosmological parameters 
+  
+real, parameter :: omegam=0.307112
+real, parameter :: omegav=1-omegam
+real, parameter :: h=0.6777
+real, parameter :: w_de = -1.0  
+real, parameter :: lbox=512.0  ! length of lensing simulation box
+real, parameter :: sbox=512.0  ! !! length of second box
+real, parameter :: zs=2.7! 3.0 !1000.
+real, parameter :: Area= 100.0 ! sq. deg. : 12.84 for CFHT, 25.0 for CMB, 40.0 or 60.0 for KiDSLenS
+
+!! simulation parameters
+!! nslice is the number of projections, obtained from cubep3m.threads.070515/input/projections 
+!! nr is the number of lensing field
+!! nc is the number of grids for the simulation box
+!! nn is the number of nodes
+!! npc is the number of pixels for the lensing field 
+
+integer, parameter :: nslice_far=1 
+integer, parameter :: nslice_close=21
+integer, parameter :: nslice=nslice_close + nslice_far
+integer, parameter :: nr=450 ! 100 !60 !10 
+integer, parameter :: nc=2048 
+integer, parameter :: nodes_dim=4   
+integer, parameter :: nn=nodes_dim**3
+integer, parameter :: hc=nc/2
+integer, parameter :: npc= 4096!7745 !6000! 3072!1536!1024 !nc/2
+integer, parameter :: nc_close = nc! 16 ! the code assumes nc_close <=  nc
+
+
+
+
+
+!! I/O PATH and files 
+
+integer, parameter :: num_nbody_runs=87 !4
+real, dimension(num_nbody_runs) :: list_run=(/1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,25,26,27,29,30,31,32,33,34,35,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,53,54,55,56,59,61,62,64,65,66,67,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,91,92,95,96,97,98,99,100/) 
+!real, dimension(7) :: list_run=(/1,2,3,4,1,2,3/) 
+!real, dimension(10) :: list_run=(/1,2,3,4,1,2,4,1,4,4/)
+
+character(*), parameter :: proj_path='./data/'
+character(*), parameter :: Lens_output_path='./data/'
+character(*), parameter :: proj_path2= proj_path 
+
+character(*), parameter :: halo_path='./Halo_in/'
+character(*), parameter :: halo_path2='./Halo_out/'
+
+!Get the z_slice redshifts from workdir/input/projections 
+character(*), parameter :: fn_z= 'checkpoints_L512'
+character(*), parameter :: fn_z_s= 'checkpoints_L512_zs'
+
+character(*), parameter :: fn_ps='ps.z='
+character(*), parameter :: fn_Defl='Defl.dat'
+character(*), parameter :: fn_kappa='kappa.dat' ! name of the kappa map binary
+character(*), parameter :: fn_delta='delta.dat'
+character(*), parameter :: fn_gamma1='gamma1.dat'
+character(*), parameter :: fn_gamma2='gamma2.dat'
+character(*), parameter :: LOS='LOS' 
+
