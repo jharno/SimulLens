@@ -12,7 +12,7 @@
       PARAMETER (M=7,NSTACK=100)
       !PARAMETER (M=7,NSTACK=50)
       INTEGER i,ir,j,jstack,k,l,istack(NSTACK)
-      INTEGER b,itemp
+      INTEGER(8) b,itemp
       REAL a,temp
       jstack=0
       l=1
