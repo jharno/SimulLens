@@ -239,6 +239,75 @@ contains
     return
   end subroutine kappa_to_defl
 
+   !---
+  subroutine kappa_to_shear_nodefl(kappa,shear,phi,fmap,nc)
+    implicit none
+
+    integer nc,nt
+    real, dimension(nc,nc) :: kappa
+    real,dimension(nc,nc) :: phi
+    type(Spin2), dimension(nc,nc) :: shear 
+
+    complex, dimension(nc,nc) :: fmap,fphi,fgama1,fgama2
+    integer kx,ky,i1,j1
+    real pi
+
+    pi=acos(-1.)
+    fmap=kappa(:,:)+(0.0,0.0)
+
+    write(*,*)' kappa' , sum(kappa(:,:)/nc/nc), minval(kappa(:,:)),maxval(kappa(:,:)) 
+    write(*,*)' fmap (real) before fft' , sum(real(fmap(:,:))/nc/nc), minval(real(fmap(:,:))),maxval(real(fmap(:,:))) 
+    write(*,*)' fmap (imag) before fft' , sum(aimag(fmap(:,:))/nc/nc), minval(aimag(fmap(:,:))),maxval(aimag(fmap(:,:))) 
+
+    call sfft2_c2c(fmap,nc,1)
+
+    write(*,*)'fmap (real) after fft' , sum(real(fmap(:,:))/nc/nc), minval(real(fmap(:,:))),maxval(real(fmap(:,:))) 
+    write(*,*)'fmap (imag) after fft' , sum(aimag(fmap(:,:))/nc/nc), minval(aimag(fmap(:,:))),maxval(aimag(fmap(:,:))) 
+ 
+    nt = 24
+    write(*,*) 'Looping with openmp, n_threads = ', nt
+    !$ call omp_set_num_threads(nt)
+    !$omp parallel do default(private) shared(fphi,fgama1,fgama2) 
+    do kx=0,nc-1
+       do ky=0,nc-1
+          if((kx.eq.0).and.(ky.eq.0)) then
+             fphi(1,1)=(0.0,0.0)
+             fgama1(1,1)=(0.0,0.0)
+             fgama2(1,1)=(0.0,0.0)
+          else
+             fphi(kx+1,ky+1)=-1.0/2*fmap(kx+1,ky+1)*(1**2)&
+               &/((sin(kx*pi*1./nc))**2+(sin(ky*pi*1./nc))**2)
+             fgama1(kx+1,ky+1)=fphi(kx+1,ky+1)*(-2.0)/(1**2)&
+               &*((sin(kx*pi*1./nc))**2-(sin(ky*pi*1./nc))**2)
+             fgama2(kx+1,ky+1)=fphi(kx+1,ky+1)/(1**2)&
+               &*(1+(cos(2*pi*kx*1./nc)+(0.0,1.0)*sin(2*pi*kx*1./nc))*&
+               &(cos(2*pi*ky*1./nc)+(0.0,1.0)*sin(2*pi*ky*1./nc))-&
+               &(cos(2*pi*kx*1./nc)+(0.0,1.0)*sin(2*pi*kx*1./nc))-&
+               &(cos(2*pi*ky*1./nc)+(0.0,1.0)*sin(2*pi*ky*1./nc)))
+          endif
+       enddo
+    enddo
+    !$omp end parallel do 
+    write(*,*) 'Got Fourier maps'
+
+    !call sfft2_c2c(fphi,nc,-1)
+    !phi=fphi
+    !write(*,*) 'Got phi'
+    call sfft2_c2c(fgama1,nc,-1)
+    shear%p=fgama1
+    write(*,*) 'Got gamma1'
+    call sfft2_c2c(fgama2,nc,-1)
+    shear%c=fgama2
+    write(*,*) 'Got gamma2'
+
+    write(*,*)' Unzoomed shear c mean,min,max:' , sum(shear(:,:)%c/nc/nc), minval(shear(:,:)%c),maxval(shear(:,:)%c) 
+    write(*,*)' Unzoomed shear p mean,min,max:' , sum(shear(:,:)%p/nc/nc), minval(shear(:,:)%p),maxval(shear(:,:)%p) 
+
+    return
+  end subroutine kappa_to_shear_nodefl
+
+  !---
+
   subroutine kappa2gamma(kappa,defl,shear,phi,nc)
     implicit none
 

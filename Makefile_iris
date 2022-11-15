@@ -29,13 +29,15 @@ INCLUDE= -I$(FFTWINC)
 ###############    *****        Then run cal_shear w/o kappa and gamma, with 'read_shift = 1' instead. Cal_shear supports -O1 max.
 
 #kappa, delta  and power spectrum. Watch out for overwriting the random offsets...
+#BACCO:
+FFLAGS = $(INCLUDE)  -cpp -O3 -ffree-line-length-none -Wall  -Dgfort -mcmodel=medium  -Dcubepm -Dz_slices -Dwrite_kappa -Dfull_geometry -Dwrite_delta_maps -DOPENMP -Dpower_spectrum -DOMP -DfR #-Dmix_nbody_runs
 #FFLAGS = $(INCLUDE)  -O3 -fpp -g -parallel -i_dynamic -mcmodel=medium -Dcubepm -Dz_slices -Dwrite_kappa -Dfull_geometry -Dwrite_delta_maps -DOPENMP -Dpower_spectrum -DOMP -DfR #-Dmix_nbody_runs
-FFLAGS = $(INCLUDE)  -cpp -O0 -ffree-line-length-none -Wall  -Dgfort -mcmodel=medium  -Dcubepm -Dz_slices -Dwrite_kappa -Dfull_geometry -Dwrite_delta_maps -DOPENMP -Dpower_spectrum -DOMP -DfR #-Dmix_nbody_runs
 
 #shear
+#BACCO:
+#FFLAGS = $(INCLUDE) -cpp -O3  -ffree-line-length-none -Wall  -Dgfort -mcmodel=medium -Dcubepm -Dz_slices -Dfull_geometry -Dcalshear  -DOMP -DfR #-DNEUTRINOS #gfortran
 #FFLAGS = $(INCLUDE)  -O1  -fpp -fpe0 -g -parallel -i_dynamic -mcmodel=medium -Dcubepm -Dz_slices -Dfull_geometry -Dcalshear -DOMP #ifort
 #FFLAGS = $(INCLUDE) -cpp -O3  -ffree-line-length-none -Wall  -Dgfort -mcmodel=medium -Dcubepm -Dz_slices -Dfull_geometry -Dcalshear -DOMP -DSLICS -Dmix_nbody_runs #-DNEUTRINOS #gfortran
-#FFLAGS = $(INCLUDE) -cpp -O3 -fopenmp  -ffree-line-length-none -Wall  -Dgfort -mcmodel=large -Dcubepm -Dz_slices -Dfull_geometry -Dcalshear -DOMP -DcosmoSLICS #-DNEUTRINOS #gfortran
 #FFLAGS = $(INCLUDE)  -O0 -fpp -g -parallel -i_dynamic -mcmodel=medium -Dcubepm -Dz_slices -Dfull_geometry -DOPENMP -Dcalshear -DOMP -DfR #-Dmix_nbody_runs
 
 
@@ -119,8 +121,10 @@ objects_MapsNz = spline.o splint.o Conv.o FFT.o PWS.o Chi.o Chi_wde_parallel.o
 
 default: SimulLens
 
-SimulLens: source/SimulLens_2boxes_New.f90 $(objects)
-	$(FC) $(FFLAGS) source/SimulLens_2boxes_New.f90 $(objects) $(LDPATH) $(LDLIBS)  -o SimulLens
+SimulLens: source/SimulLens_Born.f90 $(objects)
+	$(FC) $(FFLAGS) source/SimulLens_Born.f90 $(objects) $(LDPATH) $(LDLIBS)  -o SimulLens
+#SimulLens: source/SimulLens_2boxes_New.f90 $(objects)
+#	$(FC) $(FFLAGS) source/SimulLens_2boxes_New.f90 $(objects) $(LDPATH) $(LDLIBS)  -o SimulLens
 #SimulLens: source/SimulLens_TCS_2boxes.f90 $(objects)
 #	$(FC) $(FFLAGS) source/SimulLens_TCS_2boxes.f90 $(objects) $(LDPATH) $(LDLIBS)  -o SimulLens
 #SimulLens: source/SimulLens.f90 $(objects)
