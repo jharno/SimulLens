@@ -39,7 +39,7 @@ subroutine chi_python(z,omegam,omegal,w_de,h, chi_wde)
 !#============
 
 
-  call system("echo IN THE LOOP")
+  call system("echo Computing cosmology distances")
   call system("while [ -f ./cosmo_par.tmp ]; do echo cosmo file exists, will sleep ; sleep 1 ; done")
 
   !call system("rm cosmo_par.tmp")
@@ -56,6 +56,7 @@ subroutine chi_python(z,omegam,omegal,w_de,h, chi_wde)
 
   call system("rm cosmo_par.tmp")
   call system("rm chi_from_python.tmp")
+  call system("echo Done!")
 
 !# Once copying is completed delete the lockfile so another
 !# process can begin

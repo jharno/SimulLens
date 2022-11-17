@@ -30,7 +30,7 @@ INCLUDE= -I$(FFTWINC)
 
 #kappa, delta  and power spectrum. Watch out for overwriting the random offsets...
 #BACCO:
-FFLAGS = $(INCLUDE)  -cpp -O3 -ffree-line-length-none -Wall  -Dgfort -mcmodel=medium  -Dcubepm -Dz_slices -Dwrite_kappa -Dfull_geometry -Dwrite_delta_maps -DOPENMP -Dpower_spectrum -DOMP -DfR #-Dmix_nbody_runs
+FFLAGS = $(INCLUDE)  -cpp -O0 -ffree-line-length-none -Wall  -Dgfort -mcmodel=medium  -Dcubepm -Dz_slices -Dwrite_kappa -Dfull_geometry -Dwrite_delta_maps -DOPENMP -Dpower_spectrum -DOMP -DfR #-Dmix_nbody_runs
 #FFLAGS = $(INCLUDE)  -O3 -fpp -g -parallel -i_dynamic -mcmodel=medium -Dcubepm -Dz_slices -Dwrite_kappa -Dfull_geometry -Dwrite_delta_maps -DOPENMP -Dpower_spectrum -DOMP -DfR #-Dmix_nbody_runs
 
 #shear
@@ -113,7 +113,7 @@ FFLAGS = $(INCLUDE)  -cpp -O3 -ffree-line-length-none -Wall  -Dgfort -mcmodel=me
 # -Dmix_nbody_runs,-DHALO_CATALOGUE,-Dhalo_only, -Dintegrate,-Dpower_spectrum,-Ddebug_halo_intense,-Ddebug_project,-Ddebug_cic
 
 
-objects = spline.o splint.o Conv.o FFT.o PWS.o GaussRandomField.o InterP.o Chi.o  Lensing.o IndexShell.o  StringOpt.o Euler.o indexedsort_PID.o InverseChi.o  indexedsort.o Chi_wde.o
+objects = spline.o splint.o Conv.o FFT.o PWS.o GaussRandomField.o InterP.o Chi.o  Lensing.o IndexShell.o  StringOpt.o Euler.o indexedsort_PID.o InverseChi.o  indexedsort.o Chi_wde.o Chi_wde_table.o
 objects_sort =  StringOpt.o indexedsort.o #sort_alt.o 
 objects_MapsNz = spline.o splint.o Conv.o FFT.o PWS.o Chi.o Chi_wde_parallel.o
 
@@ -227,6 +227,9 @@ Chi_wde.o: source/JoLib/Chi_wde.f90
 
 Chi_wde_parallel.o: source/JoLib/Chi_wde_parallel.f90
 	$(FC) $(FFLAGS) -c source/JoLib/Chi_wde_parallel.f90
+
+Chi_wde_table.o: source/JoLib/Chi_wde_table.f90
+	$(FC) $(FFLAGS) -c source/JoLib/Chi_wde_table.f90
 
 #nrecip.o: ../PopulateHalos/nrecip.f
 #	$(FC) $(FFLAGS) -c ../PopulateHalos/nrecip.f
