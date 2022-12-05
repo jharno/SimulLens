@@ -4,6 +4,7 @@ real, parameter :: omegam=0.307112
 real, parameter :: omegav=1-omegam
 real, parameter :: h=0.6777
 real, parameter :: w_de = -1.0  
+real, parameter :: w_a = 0.0  
 real, parameter :: lbox=512.0  ! length of lensing simulation box
 real, parameter :: sbox=512.0  ! !! length of second box
 real, parameter :: zs=2.7! 3.0 !1000.
@@ -48,6 +49,7 @@ character(*), parameter :: halo_path2='./Halo_out/'
 !Get the z_slice redshifts from workdir/input/projections 
 character(*), parameter :: fn_z= 'checkpoints_L512'
 character(*), parameter :: fn_z_s= 'checkpoints_L512_zs'
+character(*), parameter :: chi_z= 'chi_z.txt'
 
 character(*), parameter :: fn_ps='ps.z='
 character(*), parameter :: fn_Defl='Defl.dat'

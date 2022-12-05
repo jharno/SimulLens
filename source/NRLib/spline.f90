@@ -1,7 +1,7 @@
       SUBROUTINE spline(x,y,n,yp1,ypn,y2)
       INTEGER n,NMAX
       REAL yp1,ypn,x(n),y(n),y2(n)
-      PARAMETER (NMAX=500)
+      PARAMETER (NMAX=1000)
 !      PARAMETER (NMAX=2000)
 !      PARAMETER (NMAX=7000)
       INTEGER i,k

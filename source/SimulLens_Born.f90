@@ -76,7 +76,7 @@ program SimulLens
 !--------
 #ifndef halo_only
   ! Arrays on original grid
-  real(4) :: input_map_d(nc,nc)
+  real(8) :: input_map_d(nc,nc)
   real, dimension(nc,nc) :: input_map 
   real, dimension(2*nc,2*nc):: zoom_map
   complex, dimension(nc,nc):: map_cplx
@@ -118,7 +118,8 @@ program SimulLens
   type(vec2D) shift, mesh_shift
   integer i,j,k,fu,i1,j1,j2,i3,icount,kx,ky,ir,index_nbody_run,file_status , newLOS,patch, first_random_call, stat
   real lense_weight,frac,angle,dang,chi,pi,random_index_run,box,kernel,ScaleFactor, dummy, P2D_Mead_bias, chi_wde, chi_wde_s
-  real(4) z_table(500), chi_table(500), dz, d2ydx2(500)
+  integer, parameter::z_chi_len=1000!500
+  real(4) z_table(z_chi_len), chi_table(z_chi_len), dz, d2ydx2(z_chi_len)
   real(kind=8) rhomean
   character(len=180) :: fn,fn1,fp,my_status, test_str, ir_str, nr_min_str, nr_max_str, map_in_dir, map_out_dir, seed_dir
   character(len=7) z_string, index_str, newLOS_str,LOS_str, seed_fr, nodeID
@@ -201,10 +202,10 @@ program SimulLens
 ! Only write shift to file for kappa maps. Else, read it.
 
 #ifdef write_kappa
-  integer, parameter ::  write_shift = 0 ! Mead, fergus, cosmoSLICS, exception
-  integer, parameter ::  read_shift = 1!  ! Mead, fergus, cosmoSLICS, exception
-  !integer, parameter ::  write_shift = 1 ! KiDS, recycle, first pass at cosmoSLICS
-  !integer, parameter ::  read_shift = 0  ! KiDS, recycle first pass at cosmoSLICS
+  !integer, parameter ::  write_shift = 0 ! Mead, fergus, cosmoSLICS, exception
+  !integer, parameter ::  read_shift = 1!  ! Mead, fergus, cosmoSLICS, exception
+  integer, parameter ::  write_shift = 0 ! KiDS, recycle, first pass at cosmoSLICS
+  integer, parameter ::  read_shift = 1  ! KiDS, recycle first pass at cosmoSLICS
 
   !-------
   ! for mix_nbody_runs
@@ -305,15 +306,22 @@ program SimulLens
   enddo 
   !call chi_table_python((/0.01, 1.0, z_tmp/), omegam, omegav, w_de, h, chi_table(1:3),3)
   !call chi_table_python(z_table(428:430), omegam, omegav, w_de, h, chi_table(428:430),3)
-  call chi_table_python(z_table, omegam, omegav, w_de, h, chi_table,500)
-  call spline(z_table, chi_table, 500, dz,dz,d2ydx2)
+  !call chi_table_python(z_table, omegam, omegav, w_de, h, chi_table,z_chi_len)
+  !call spline(z_table, chi_table, z_chi_len, dz,dz,d2ydx2)
+  open(11,file=chi_z)
+  do i=1,z_chi_len
+     read(11,*) z_table(i), chi_table(i)
+  enddo
+  close(11)
+
+
   write(*,*) 'done!'
-  do i = 1,500
+  do i = 1,z_chi_len
      write(*,*) z_table(i), chi_table(i)
   enddo
 
   ! And interpolate:     
-  call splint(z_table, chi_table, d2ydx2, 500, z_tmp, chi_wde)
+  call splint(z_table, chi_table, d2ydx2, z_chi_len, z_tmp, chi_wde)
   print*, chi_wde
   !stop
   !----
@@ -670,8 +678,8 @@ program SimulLens
         if (nr>1) then
 
            if(write_shift.eq.1) then
-              !call random_number(rand_subvol)
-              rand_subvol = 0.1
+              call random_number(rand_subvol)
+              !rand_subvol = 0.1
            else     
               if(nr>1.and. ir<10)then
                   write (fn1,'("_cone", i1)') ir
@@ -940,7 +948,7 @@ program SimulLens
 #ifdef mix_nbody_runs
                 open(100,file=Lens_output_path//"random_shift_subvol"//trim(fn1))
 #else
-                open(100,file=Lens_output_path//"random_shift_subvol_LOS"//trim(LOS_str)//trim(fn1))
+                open(100,file=trim(seed_dir)//"random_shift_subvol_LOS"//trim(LOS_str)//trim(fn1))
 #endif
                 !open(100,file=Lens_output_path//"random_shift_LOS"//trim(LOS_str)//trim(fn1))
                 !open(100,file=Lens_output_path//trim(LOS_str)//"/random_shift")
@@ -952,7 +960,7 @@ program SimulLens
 #ifdef mix_nbody_runs
                 open(100,file=Lens_output_path//"random_shift_subvol"//trim(fn1), position = 'append')
 #else
-                open(100,file=Lens_output_path//"random_shift_subvol_LOS"//trim(LOS_str)//trim(fn1), position = 'append')
+                open(100,file=trim(seed_dir)//"random_shift_subvol_LOS"//trim(LOS_str)//trim(fn1), position = 'append')
 #endif
                 !open(100,file=Lens_output_path//trim(LOS_str)//"/random_shift", position = 'append')
                 !write(100,*) shift%x, shift%y
@@ -1100,7 +1108,7 @@ program SimulLens
 !********************
 
         ! Get the cosmological distance
-        call splint(z_table, chi_table, d2ydx2, 500, z_write(j), chi_wde)
+        call splint(z_table, chi_table, d2ydx2, z_chi_len, z_write(j), chi_wde)
         !call chi_python(z_write(j), omegam, omegav, w_de, h, chi_wde )
 
         ip = 0
@@ -2367,8 +2375,10 @@ program SimulLens
         !print *, chi_wde
         !print *, "FORTRAN: EXIT2"
         !---
-        call splint(z_table, chi_table, d2ydx2, 500, z_write(j), chi_wde)
         !call chi_python(z_write(j), omegam, omegav, w_de, h, chi_wde) 
+        !print *, 'python:', chi_wde
+        call splint(z_table, chi_table, d2ydx2, z_chi_len, z_write(j), chi_wde)
+        print *, 'splint:', chi_wde
         !if(chi(z_write(j),omegam,h) .eq.0) then 
         if(chi_wde .eq.0) then 
            frac=angle/(box / 0.00001) 
@@ -2410,8 +2420,10 @@ program SimulLens
 
           !tmp_map = defl%x
           !call zoomshiftmap(tmp_map,tmp_pix_map,zoom_map, nc,npc,shift,CorrBornDefl,frac)
+          call splint(z_table, chi_table, d2ydx2, z_chi_len, z_write(j), chi_wde)
+          print *, 'splint:', chi_wde
           !call chi_python(z_write(j), omegam, omegav, w_de, h, chi_wde)
-          call splint(z_table, chi_table, d2ydx2, 500, z_write(j), chi_wde)
+          !print *, 'python:', chi_wde
           !newdefl(:,:,j)%x = tmp_pix_map*(box/nc)/chi_wde
           !newdefl(:,:,j)%x = tmp_pix_map*(box/nc)/chi(z_write(j),omegam,h)/h
           !write(*,*)'newdefl x mean,min,max:' , sum(newdefl(:,:,j)%x/nc/nc), minval(newdefl(:,:,j)%x),maxval(newdefl(:,:,j)%x) 
@@ -2518,8 +2530,10 @@ program SimulLens
            ! zoom the slices by 'frac = 
            !(theta_source/theta_lens)' to fit the field of view
            !******************************
-           call splint(z_table, chi_table, d2ydx2, 500, z_write(j), chi_wde)
            !call chi_python(z_write(j), omegam, omegav, w_de, h, chi_wde)
+           !print *, 'python:', chi_wde
+           call splint(z_table, chi_table, d2ydx2, z_chi_len, z_write(j), chi_wde)
+           print *, 'splint:', chi_wde
            if(chi_wde .eq.0) then 
            !if(chi(z_write(j),omegam,h) .eq.0) then 
               frac=angle/(box / 0.00001) 
@@ -2536,8 +2550,10 @@ program SimulLens
            !write(*,*) 'good frac = ' , angle/(box / chi(z_write(j),omegam,h)/h)
            !pause
 
+           call splint(z_table, chi_table, d2ydx2, z_chi_len, z_write_s(i), chi_wde_s)
+           !print *, 'splint:', chi_wde_s
            !call chi_python(z_write_s(i), omegam, omegav, w_de, h, chi_wde_s)
-           call splint(z_table, chi_table, d2ydx2, 500, z_write_s(i), chi_wde_s)
+           !print *, 'python:', chi_wde_s
 
            !-----------------------------
            !Get the Kernel geometry in!!!
@@ -3017,10 +3033,10 @@ end program SimulLens
     !$omp parallel do default(shared) private(j2,i2,jb,ib,w2,w1,ip,jp)
     do j2=1,n2
        do i2=1,n2
-          jb=INT(shift%y*n1+(j2-1)*frac1+1)!+defl(i2,j2)%y*n2
-          ib=INT(shift%x*n1+(i2-1)*frac1+1)!+defl(i2,j2)%x*n2
-          w2=INT(shift%y*n1+(j2-1)*frac1+1-jb)!+defl(i2,j2)%y*n2
-          w1=INT(shift%x*n1+(i2-1)*frac1+1-ib)!+defl(i2,j2)%x*n2
+          jb=shift%y*n1+(j2-1)*frac1+1!+defl(i2,j2)%y*n2
+          ib=shift%x*n1+(i2-1)*frac1+1!+defl(i2,j2)%x*n2
+          w2=shift%y*n1+(j2-1)*frac1+1-jb!+defl(i2,j2)%y*n2
+          w1=shift%x*n1+(i2-1)*frac1+1-ib!+defl(i2,j2)%x*n2
           jb=modulo(jb-1,2*n1)+1
           ib=modulo(ib-1,2*n1)+1
           jp=modulo(jb,2*n1)+1
@@ -3059,10 +3075,10 @@ end program SimulLens
     !$omp parallel do default(shared) private(j2,i2,jb,ib,w2,w1,ip,jp)
     do j2=1,n2
        do i2=1,n2
-          jb=shift%y*n1+(j2-1)*frac1+1
-          ib=shift%x*n1+(i2-1)*frac1+1
-          w2=shift%y*n1+(j2-1)*frac1+1-jb
-          w1=shift%x*n1+(i2-1)*frac1+1-ib
+          jb=int(shift%y*n1+(j2-1)*frac1+1)
+          ib=int(shift%x*n1+(i2-1)*frac1+1)
+          w2=int(shift%y*n1+(j2-1)*frac1+1-jb)
+          w1=int(shift%x*n1+(i2-1)*frac1+1-ib)
           jb=modulo(jb-1,2*n1)+1
           ib=modulo(ib-1,2*n1)+1
           jp=modulo(jb,2*n1)+1
@@ -3158,8 +3174,8 @@ end program SimulLens
     !$omp parallel do default(shared) private(i1,j1,i2,j2,jb,jp,ib,ip,w1,w2,X_array,alpha,coeff)
     do j2=1,n2
        do i2=1,n2
-          jb=INT(shift%y*n1+(j2-1)*frac1+1+defl(i2,j2)%y*n2)
-          ib=INT(shift%x*n1+(i2-1)*frac1+1+defl(i2,j2)%x*n2)
+          jb=int(shift%y*n1+(j2-1)*frac1+1+defl(i2,j2)%y*n2)
+          ib=int(shift%x*n1+(i2-1)*frac1+1+defl(i2,j2)%x*n2)
           jb=modulo(jb-1,2*n1)+1
           ib=modulo(ib-1,2*n1)+1
           jp=modulo(jb,2*n1)+1

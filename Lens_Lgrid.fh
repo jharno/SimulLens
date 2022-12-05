@@ -4,6 +4,7 @@ real, parameter :: omegam=0.307112
 real, parameter :: omegav=1-omegam
 real, parameter :: h=0.6777
 real, parameter :: w_de = -1.0  
+real, parameter :: w_a = 0.0  
 real, parameter :: lbox=512.0  ! length of lensing simulation box, in Mpc/h
 real, parameter :: sbox=512.0  ! length of second box, if any, in Mpc/h
 
@@ -46,6 +47,7 @@ character(*), parameter :: halo_path2='./Halo_out/'
 !Get the redshifts of mass sheets, and that of their back-end plane, to be used for lens and source redshifts respectively
 character(*), parameter :: fn_z= 'checkpoints'
 character(*), parameter :: fn_z_s= 'checkpoints_zs'
+character(*), parameter :: chi_z= 'chi_z.txt'
 
 character(*), parameter :: fn_ps='ps.z='
 character(*), parameter :: fn_Defl='Defl.dat'
