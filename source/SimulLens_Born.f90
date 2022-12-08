@@ -76,7 +76,7 @@ program SimulLens
 !--------
 #ifndef halo_only
   ! Arrays on original grid
-  real(8) :: input_map_d(nc,nc)
+  real(4) :: input_map_d(nc,nc)
   real, dimension(nc,nc) :: input_map 
   real, dimension(2*nc,2*nc):: zoom_map
   complex, dimension(nc,nc):: map_cplx
@@ -3033,8 +3033,8 @@ end program SimulLens
     !$omp parallel do default(shared) private(j2,i2,jb,ib,w2,w1,ip,jp)
     do j2=1,n2
        do i2=1,n2
-          jb=shift%y*n1+(j2-1)*frac1+1!+defl(i2,j2)%y*n2
-          ib=shift%x*n1+(i2-1)*frac1+1!+defl(i2,j2)%x*n2
+          jb=int(shift%y*n1+(j2-1)*frac1+1)!+defl(i2,j2)%y*n2
+          ib=int(shift%x*n1+(i2-1)*frac1+1)!+defl(i2,j2)%x*n2
           w2=shift%y*n1+(j2-1)*frac1+1-jb!+defl(i2,j2)%y*n2
           w1=shift%x*n1+(i2-1)*frac1+1-ib!+defl(i2,j2)%x*n2
           jb=modulo(jb-1,2*n1)+1
@@ -3077,8 +3077,8 @@ end program SimulLens
        do i2=1,n2
           jb=int(shift%y*n1+(j2-1)*frac1+1)
           ib=int(shift%x*n1+(i2-1)*frac1+1)
-          w2=int(shift%y*n1+(j2-1)*frac1+1-jb)
-          w1=int(shift%x*n1+(i2-1)*frac1+1-ib)
+          w2=shift%y*n1+(j2-1)*frac1+1-jb
+          w1=shift%x*n1+(i2-1)*frac1+1-ib
           jb=modulo(jb-1,2*n1)+1
           ib=modulo(ib-1,2*n1)+1
           jp=modulo(jb,2*n1)+1
