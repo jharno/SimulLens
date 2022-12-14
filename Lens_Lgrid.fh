@@ -45,9 +45,10 @@ character(*), parameter :: halo_path='./Halo_in/'
 character(*), parameter :: halo_path2='./Halo_out/'
 
 !Get the redshifts of mass sheets, and that of their back-end plane, to be used for lens and source redshifts respectively
-character(*), parameter :: fn_z= 'checkpoints'
-character(*), parameter :: fn_z_s= 'checkpoints_zs'
+character(*), parameter :: fn_z= 'checkpoints_Lgrid'
+character(*), parameter :: fn_z_s= 'checkpoints_Lgrid_zs'
 character(*), parameter :: chi_z= 'chi_z.txt'
+character(*), parameter :: D_z= 'D_z.txt'
 
 character(*), parameter :: fn_ps='ps.z='
 character(*), parameter :: fn_Defl='Defl.dat'

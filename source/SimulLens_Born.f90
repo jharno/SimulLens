@@ -116,15 +116,16 @@ program SimulLens
   real, dimension(nslice) :: z_write,z_write_s
   integer, dimension(nslice) :: snap
   type(vec2D) shift, mesh_shift
-  integer i,j,k,fu,i1,j1,j2,i3,icount,kx,ky,ir,index_nbody_run,file_status , newLOS,patch, first_random_call, stat
-  real lense_weight,frac,angle,dang,chi,pi,random_index_run,box,kernel,ScaleFactor, dummy, P2D_Mead_bias, chi_wde, chi_wde_s
+  integer i,j,k,fu,i1,j1,j2,i3,icount,kx,ky,ir,index_nbody_run,file_status,newLOS,patch,first_random_call,stat
+  real lense_weight,frac,angle,dang,chi,pi,random_index_run,box,kernel,ScaleFactor,dummy,P2D_Mead_bias,chi_wde,chi_wde_s
   integer, parameter::z_chi_len=1000!500
-  real(4) z_table(z_chi_len), chi_table(z_chi_len), dz, d2ydx2(z_chi_len)
+  real(4) z_table(z_chi_len),chi_table(z_chi_len),dz,d2ydx2(z_chi_len),chi_min,chi_max,kernel_min,kernel_max,kernel_mean,D_min,D_max,D_mean
+  real(4) d2ydx2_D(z_chi_len),d2ydx2_chi(z_chi_len),D_table(z_chi_len),dchi
   real(kind=8) rhomean
-  character(len=180) :: fn,fn1,fp,my_status, test_str, ir_str, nr_min_str, nr_max_str, map_in_dir, map_out_dir, seed_dir
-  character(len=7) z_string, index_str, newLOS_str,LOS_str, seed_fr, nodeID
+  character(len=180) :: fn,fn1,fp,my_status,test_str,ir_str,nr_min_str,nr_max_str,map_in_dir,map_out_dir,seed_dir
+  character(len=7) z_string,index_str,newLOS_str,LOS_str,seed_fr,nodeID
   character(len=10) :: date,time,zone
-  real InverseChi, z_tmp, mychi
+  real InverseChi, z_tmp, mychi, chi_mean, z_mean
   integer nr_min, nr_max
 
   !-------- Multi-plateform code. For projection maps :
@@ -238,6 +239,8 @@ program SimulLens
   integer, parameter :: CorrectP2D = 0 ! Set to 1 for Mead, ***if you have the correct file* 
   integer, parameter :: MeshShift = 0  ! Set to 1 for Mead, 0 for KiDS or Gadget
   integer, parameter :: Manual_z_s = 1 ! Set to 0 for Mead, 1 for KiDS
+  integer, parameter :: SimpsonsRule = 1
+  integer, parameter :: CorrectGrowth = 1
 
 !#ifndef halo_only
 !-----------------------------------
@@ -300,31 +303,43 @@ program SimulLens
 
   write(*,*) 'Making the interpolation table...'
   ! make [chi - z] table:
-  dz = 4.0/500.0
-  do i = 1,500
-     z_table(i) = 0.005 + dz*(i-1)
-  enddo 
+  !dz = 4.0/500.0
+  !do i = 1,500
+  !   z_table(i) = 0.005 + dz*(i-1)
+  !enddo 
   !call chi_table_python((/0.01, 1.0, z_tmp/), omegam, omegav, w_de, h, chi_table(1:3),3)
   !call chi_table_python(z_table(428:430), omegam, omegav, w_de, h, chi_table(428:430),3)
   !call chi_table_python(z_table, omegam, omegav, w_de, h, chi_table,z_chi_len)
-  !call spline(z_table, chi_table, z_chi_len, dz,dz,d2ydx2)
   open(11,file=chi_z)
   do i=1,z_chi_len
      read(11,*) z_table(i), chi_table(i)
   enddo
   close(11)
 
+  dz = z_table(2) - z_table(1)
+  dchi = chi_table(2) - chi_table(1)
+  call spline(z_table, chi_table, z_chi_len, dz,dz,d2ydx2)
+  call spline(chi_table, z_table, z_chi_len, dchi,dchi,d2ydx2_chi)
 
   write(*,*) 'done!'
-  do i = 1,z_chi_len
-     write(*,*) z_table(i), chi_table(i)
-  enddo
+  !do i = 1,z_chi_len
+  !   write(*,*) z_table(i), chi_table(i)
+  !enddo
 
   ! And interpolate:     
   call splint(z_table, chi_table, d2ydx2, z_chi_len, z_tmp, chi_wde)
   print*, chi_wde
   !stop
   !----
+  ! Read growth factor redshift table
+  open(11,file=D_z)
+  do i=1,z_chi_len
+     read(11,*) z_table(i), D_table(i)
+     !write(*,*) z_table(i), D_table(i)
+  enddo
+  close(11)
+  call spline(z_table, D_table, z_chi_len, dz,dz,d2ydx2_D)
+  !stop
 
   angle = sqrt(Area)/180.*pi  ! For UBC Lens
   dang=angle/npc
@@ -2560,6 +2575,52 @@ program SimulLens
            kernel = (3./2)*omegam*(box/nc)/(3.E3)**2*(chi_wde)*(1+z_write(j))*(1-chi_wde/chi_wde_s)
            !kernel = (3./2)*omegam*(box/nc)/(3.E3)**2*(chi(z_write(j),omegam,h)*h)*(1+z_write(j))*(1-chi(z_write(j),omegam,h)/chi(z_write_s(i),omegam,h))
            write(*,*) 'chi_lens, z_lens, chi_s, kernel', chi_wde, z_write(j), chi_wde_s, (chi_wde)*(1+z_write(j))*(1-chi_wde/chi_wde_s)
+
+           !----------------------------------
+           ! Use Simpson's integration  rule:
+           if(SimpsonsRule==1) then
+           ! Get the exact min-max chi's
+           call splint(z_table,chi_table,d2ydx2,z_chi_len,z_write_s(j),chi_max)
+           if (j<nslice) then
+              call splint(z_table,chi_table,d2ydx2,z_chi_len,z_write_s(j+1),chi_min)
+           else
+              chi_min=0.0
+           endif
+           chi_mean = 0.5*(chi_min+chi_max) ! could be 3.0/4.0 * (chi_max*4 -chi_min**4)/ (chi_max*3 -chi_min**3)
+           write(*,*) 'chis:',i,j,chi_min, chi_wde, chi_max, chi_mean
+
+           ! Get the exact mean redshift
+           call splint(chi_table,z_table,d2ydx2_chi,z_chi_len,chi_mean,z_mean)
+           write(*,*) 'redshifts:', z_write_s(j+1), z_write(j), z_mean, z_write_s(j)
+
+           if(CorrectGrowth==1) then
+              call splint(z_table,D_table,d2ydx2_D,z_chi_len,z_mean,D_mean)
+              call splint(z_table,D_table,d2ydx2_D,z_chi_len,z_write_s(j),D_max)
+              if (j<nslice) then
+                 call splint(z_table,D_table,d2ydx2_D,z_chi_len,z_write_s(j+1),D_min)
+              else
+                 D_min = 1.0
+              endif
+              write(*,*) i,j, z_write_s(j+1), z_write(j), z_write_s(j), D_min, D_mean, D_max
+           else
+              D_min=1.0
+              D_max=1.0
+              D_mean=1.0
+           endif
+           !chi_l_geo = chi_wde !  
+           !chi_l_geo = 1.0/4.0 * (chi_max*4 - chi_min**4) !  
+
+           kernel_min = (3./2)*omegam*(box/nc)/(3.E3)**2*(chi_min)*(1+z_write_s(j+1))*(1-chi_min/chi_wde_s)*D_min/D_mean
+           kernel_max = (3./2)*omegam*(box/nc)/(3.E3)**2*(chi_max)*(1+z_write_s(j))*(1-chi_max/chi_wde_s)*D_max/D_mean
+           kernel_mean = kernel
+        
+           !kernel = (chi_max-chi_min)/6.0*(kernel_min + 4.0*kernel_mean + kernel_max)
+           kernel = 1.0/6.0*(kernel_min + 4.0*kernel_mean + kernel_max)
+           !write(*,*) 'kernel comp', kernel, kernel_mean
+           !----------------------------------
+           endif
+           !---------------------
+
 
            !The above assumes that 'd_chi' is constant across all volumes, and
            !that there are no 'gaps' (nor 'overlaps') between the mass sheets.

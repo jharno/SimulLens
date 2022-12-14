@@ -50,6 +50,7 @@ character(*), parameter :: halo_path2='./Halo_out/'
 character(*), parameter :: fn_z= 'checkpoints_L512'
 character(*), parameter :: fn_z_s= 'checkpoints_L512_zs'
 character(*), parameter :: chi_z= 'chi_z.txt'
+character(*), parameter :: D_z= 'D_z.txt'
 
 character(*), parameter :: fn_ps='ps.z='
 character(*), parameter :: fn_Defl='Defl.dat'
