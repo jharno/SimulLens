@@ -76,7 +76,7 @@ program SimulLens
 !--------
 #ifndef halo_only
   ! Arrays on original grid
-  real(4) :: input_map_d(nc,nc)
+  real(8) :: input_map_d(nc,nc)
   real, dimension(nc,nc) :: input_map 
   real, dimension(2*nc,2*nc):: zoom_map
   complex, dimension(nc,nc):: map_cplx
@@ -120,7 +120,7 @@ program SimulLens
   real lense_weight,frac,angle,dang,chi,pi,random_index_run,box,kernel,ScaleFactor,dummy,P2D_Mead_bias,chi_wde,chi_wde_s
   integer, parameter::z_chi_len=1000!500
   real(4) z_table(z_chi_len),chi_table(z_chi_len),dz,d2ydx2(z_chi_len),chi_min,chi_max,kernel_min,kernel_max,kernel_mean,D_min,D_max,D_mean
-  real(4) d2ydx2_D(z_chi_len),d2ydx2_chi(z_chi_len),D_table(z_chi_len),dchi
+  real(4) d2ydx2_D(z_chi_len),d2ydx2_chi(z_chi_len),D_table(z_chi_len),dchi,z_table_D(z_chi_len), dz_D
   real(kind=8) rhomean
   character(len=180) :: fn,fn1,fp,my_status,test_str,ir_str,nr_min_str,nr_max_str,map_in_dir,map_out_dir,seed_dir
   character(len=7) z_string,index_str,newLOS_str,LOS_str,seed_fr,nodeID
@@ -210,7 +210,7 @@ program SimulLens
 
   !-------
   ! for mix_nbody_runs
-  integer, parameter :: write_mix = 1 ! for recycling SLICS-HR
+  integer, parameter :: write_mix = 0 ! for recycling SLICS-HR
 #else
   integer, parameter ::  write_shift = 0 ! KiDS, recycle
   integer, parameter ::  read_shift = 1  ! KiDS, recycle
@@ -334,11 +334,12 @@ program SimulLens
   ! Read growth factor redshift table
   open(11,file=D_z)
   do i=1,z_chi_len
-     read(11,*) z_table(i), D_table(i)
-     !write(*,*) z_table(i), D_table(i)
+     read(11,*) z_table_D(i), D_table(i)
+     !write(*,*) z_table_D(i), D_table(i)
   enddo
   close(11)
-  call spline(z_table, D_table, z_chi_len, dz,dz,d2ydx2_D)
+  dz_D = z_table_D(2) - z_table_D(1)
+  call spline(z_table_D, D_table, z_chi_len, dz_D,dz_D,d2ydx2_D)
   !stop
 
   angle = sqrt(Area)/180.*pi  ! For UBC Lens
@@ -2426,17 +2427,19 @@ program SimulLens
           write(*,*)'shear c mean,min,max:' , sum(shear(:,:)%c/nc/nc), minval(shear(:,:)%c),maxval(shear(:,:)%c) 
 
           tmp_map = shear%p
-          call zoomshiftmap(tmp_map,newshear(:,:,j)%p,zoom_map, nc,npc,shift,0.0,frac)
+          !call zoomshiftmap(tmp_map,newshear(:,:,j)%p,zoom_map, nc,npc,shift,0.0,frac)
+          call zoomshiftmap_nodefl(tmp_map,newshear(:,:,j)%p,zoom_map, nc,npc,shift,frac)
 
           tmp_map = shear%c
-          call zoomshiftmap(tmp_map,newshear(:,:,j)%c,zoom_map, nc,npc,shift,0.0,frac)
+          !call zoomshiftmap(tmp_map,newshear(:,:,j)%c,zoom_map, nc,npc,shift,0.0,frac)
+          call zoomshiftmap_nodefl(tmp_map,newshear(:,:,j)%c,zoom_map, nc,npc,shift,frac)
           !call zoomshiftmap(shear%p,newshear(:,:,j)%p,zoom_map, nc,npc,shift,CorrBornDefl,frac)
           !call zoomshiftmap(shear%c,newshear(:,:,j)%c,zoom_map, nc,npc,shift,CorrBornDefl,frac)
 
           !tmp_map = defl%x
           !call zoomshiftmap(tmp_map,tmp_pix_map,zoom_map, nc,npc,shift,CorrBornDefl,frac)
-          call splint(z_table, chi_table, d2ydx2, z_chi_len, z_write(j), chi_wde)
-          print *, 'splint:', chi_wde
+          !call splint(z_table, chi_table, d2ydx2, z_chi_len, z_write(j), chi_wde)
+          !print *, 'splint:', chi_wde
           !call chi_python(z_write(j), omegam, omegav, w_de, h, chi_wde)
           !print *, 'python:', chi_wde
           !newdefl(:,:,j)%x = tmp_pix_map*(box/nc)/chi_wde
@@ -2594,10 +2597,10 @@ program SimulLens
            write(*,*) 'redshifts:', z_write_s(j+1), z_write(j), z_mean, z_write_s(j)
 
            if(CorrectGrowth==1) then
-              call splint(z_table,D_table,d2ydx2_D,z_chi_len,z_mean,D_mean)
-              call splint(z_table,D_table,d2ydx2_D,z_chi_len,z_write_s(j),D_max)
+              call splint(z_table_D,D_table,d2ydx2_D,z_chi_len,z_mean,D_mean)
+              call splint(z_table_D,D_table,d2ydx2_D,z_chi_len,z_write_s(j),D_max)
               if (j<nslice) then
-                 call splint(z_table,D_table,d2ydx2_D,z_chi_len,z_write_s(j+1),D_min)
+                 call splint(z_table_D,D_table,d2ydx2_D,z_chi_len,z_write_s(j+1),D_min)
               else
                  D_min = 1.0
               endif
