@@ -76,7 +76,7 @@ program SimulLens
 !--------
 #ifndef halo_only
   ! Arrays on original grid
-  real(8) :: input_map_d(nc,nc)
+  real(4) :: input_map_d(nc,nc)
   real, dimension(nc,nc) :: input_map 
   real, dimension(2*nc,2*nc):: zoom_map
   complex, dimension(nc,nc):: map_cplx
