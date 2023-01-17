@@ -2319,19 +2319,21 @@ program SimulLens
         !rhomean=sum(real(input_map(:,:),kind=8))/nc/nc 
         !write(*,*) 'Mean after subtraction= ',rhomean
 
-        ! f(R)
-        ! Go from particle count map to projected density map:
-        input_map(:,:) = input_map(:,:)*8.0
+        ! BACCO & f(R)
+        ! Go from particle count map to projected density map, find the mean:
+        input_map(:,:) = input_map(:,:)*8.0*(real(nc,kind=4)/512.0)**2
         rhomean=sum(real(input_map(:,:),kind=8))/nc/nc 
         write(*,*) 'Mean before subtraction= ',rhomean
 
+        ! Subtract mean, compute new mean to check:
+        !input_map(:,:) = input_map(:,:)/rhomean - 1.0
         input_map(:,:) = input_map(:,:) - rhomean
         rhomean=sum(real(input_map(:,:),kind=8))/nc/nc
         write(*,*) 'Mean after subtraction= ',rhomean
 
-        input_map(:,:) = input_map(:,:)/(1024.0/nc)**2
-        rhomean=sum(real(input_map(:,:),kind=8))/nc/nc 
-        write(*,*) 'Mean after subtraction= ',rhomean
+        !input_map(:,:) = input_map(:,:)/(1024.0/nc)**2
+        !rhomean=sum(real(input_map(:,:),kind=8))/nc/nc 
+        !write(*,*) 'Mean after subtraction= ',rhomean
 
         ! TCS
         !else
