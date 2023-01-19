@@ -2321,7 +2321,8 @@ program SimulLens
 
         ! BACCO & f(R)
         ! Go from particle count map to projected density map, find the mean:
-        input_map(:,:) = input_map(:,:)*8.0*(real(nc,kind=4)/512.0)**2
+        !input_map(:,:) = input_map(:,:)*8.0*(real(nc,kind=4)/384.0)**2
+        input_map(:,:) = input_map(:,:)*(real(nc,kind=4)/384.0)**3
         rhomean=sum(real(input_map(:,:),kind=8))/nc/nc 
         write(*,*) 'Mean before subtraction= ',rhomean
 
