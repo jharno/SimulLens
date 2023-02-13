@@ -1,0 +1,60 @@
+!! cosmological parameters 
+  
+real, parameter :: omegam=0.315
+real, parameter :: omegav=1-omegam
+real, parameter :: h=0.65
+real, parameter :: w_de = -1.0  
+real, parameter :: w_a = 0.0  
+real, parameter :: lbox=512.0  ! length of lensing simulation box, in Mpc/h
+real, parameter :: sbox=512.0  ! length of second box, if any, in Mpc/h
+
+!! Light-cone parameters
+!! nslice is the total number of mass sheets
+!! nr is the max number of pseudo-independent realisations
+!! nc is the number of grid elements in the N-body simulation box
+!! nn is the number of subvolumes, needed for reading haloes
+!! npc is the number of pixels for the lensing maps 
+
+real, parameter :: Area= 100.0 ! in sq. deg.
+integer, parameter :: nslice=26 
+real, parameter :: zs=2.7 ! Not used anymore
+integer, parameter :: nc=2048 
+integer, parameter :: npc= 512
+!------------------------------
+!Internal parameters:
+integer, parameter :: nslice_close=20
+integer, parameter :: nslice_far=nslice - nslice_close
+integer, parameter :: nr=450 
+integer, parameter :: nodes_dim=4   
+integer, parameter :: nn=nodes_dim**3
+integer, parameter :: hc=nc/2
+integer, parameter :: nc_close = nc ! In case resolution from low-reshift box differs 
+
+!! I/O PATH and files 
+
+
+! Use this for mixing N-body runs when creating light-cones. Not used here
+integer, parameter :: num_nbody_runs=87 !4
+real, dimension(num_nbody_runs) :: list_run=(/1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,25,26,27,29,30,31,32,33,34,35,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,53,54,55,56,59,61,62,64,65,66,67,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,91,92,95,96,97,98,99,100/) 
+
+character(*), parameter :: proj_path='./data/'
+character(*), parameter :: Lens_output_path='./data/'
+character(*), parameter :: proj_path2= proj_path 
+
+character(*), parameter :: halo_path='./Halo_in/'
+character(*), parameter :: halo_path2='./Halo_out/'
+
+!Get the redshifts of mass sheets, and that of their back-end plane, to be used for lens and source redshifts respectively
+character(*), parameter :: fn_z= 'checkpoints_nointerp'
+character(*), parameter :: fn_z_s= 'checkpoints_nointerp_zs'
+character(*), parameter :: chi_z= 'chi_z.txt'
+character(*), parameter :: D_z= 'D_z.txt'
+
+character(*), parameter :: fn_ps='ps.z='
+character(*), parameter :: fn_Defl='Defl.dat'
+character(*), parameter :: fn_kappa='kappa.dat' ! name of the kappa map binary
+character(*), parameter :: fn_delta='delta.dat'
+character(*), parameter :: fn_gamma1='gamma1.dat'
+character(*), parameter :: fn_gamma2='gamma2.dat'
+character(*), parameter :: LOS='LOS' 
+

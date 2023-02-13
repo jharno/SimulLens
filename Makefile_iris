@@ -30,7 +30,7 @@ INCLUDE= -I$(FFTWINC)
 
 #kappa, delta  and power spectrum. Watch out for overwriting the random offsets...
 #BACCO:
-FFLAGS = $(INCLUDE)  -cpp -O0 -ffree-line-length-none -Wall  -Dgfort -mcmodel=medium  -Dcubepm -Dz_slices -Dwrite_kappa -Dfull_geometry -Dwrite_delta_maps -DOPENMP -Dpower_spectrum -DOMP -DfR #-Dmix_nbody_runs
+FFLAGS = $(INCLUDE)  -cpp -O3 -ffree-line-length-none -Wall  -Dgfort -mcmodel=medium  -Dcubepm -Dz_slices -Dwrite_kappa -Dfull_geometry -Dwrite_delta_maps -DOPENMP -Dpower_spectrum -DOMP -DfR #-Dmix_nbody_runs
 #FFLAGS = $(INCLUDE)  -O3 -fpp -g -parallel -i_dynamic -mcmodel=medium -Dcubepm -Dz_slices -Dwrite_kappa -Dfull_geometry -Dwrite_delta_maps -DOPENMP -Dpower_spectrum -DOMP -DfR #-Dmix_nbody_runs
 
 #shear
@@ -47,6 +47,7 @@ FFLAGS = $(INCLUDE)  -cpp -O0 -ffree-line-length-none -Wall  -Dgfort -mcmodel=me
 
 #MapsNz. 
 #FFLAGS = $(INCLUDE)  -O3 -fpp -g -parallel -i_dynamic -mcmodel=medium -Dread_delta -Dwrite_kappa -Dpower_spectrum -DOMP
+#FFLAGS = $(INCLUDE) -cpp -O3  -ffree-line-length-none -Wall -mcmodel=medium -Dread_delta -Dwrite_kappa -Dpower_spectrum -DOMP -Dgfort
 
 #kappa power, no map
 #FFLAGS = $(INCLUDE)  -O1  -fpp -parallel -i_dynamic -mcmodel=medium -Dcubepm -Dz_slices  -Dfull_geometry -DOPENMP -Dpower_spectrum -DOMP
@@ -121,8 +122,10 @@ objects_MapsNz = spline.o splint.o Conv.o FFT.o PWS.o Chi.o Chi_wde_parallel.o
 
 default: SimulLens
 
-SimulLens: source/SimulLens_Born.f90 $(objects)
-	$(FC) $(FFLAGS) source/SimulLens_Born.f90 $(objects) $(LDPATH) $(LDLIBS)  -o SimulLens
+SimulLens: source/SimulLens_Born_nointerp.f90 $(objects)
+	$(FC) $(FFLAGS) source/SimulLens_Born_nointerp.f90 $(objects) $(LDPATH) $(LDLIBS)  -o SimulLens
+#SimulLens: source/SimulLens_Born.f90 $(objects)
+#	$(FC) $(FFLAGS) source/SimulLens_Born.f90 $(objects) $(LDPATH) $(LDLIBS)  -o SimulLens
 #SimulLens: source/SimulLens_2boxes_New.f90 $(objects)
 #	$(FC) $(FFLAGS) source/SimulLens_2boxes_New.f90 $(objects) $(LDPATH) $(LDLIBS)  -o SimulLens
 #SimulLens: source/SimulLens_TCS_2boxes.f90 $(objects)
@@ -157,8 +160,10 @@ Power: source/power_spectrum.f90 $(objects)
 	$(FC) $(FFLAGS) source/power_spectrum.f90 $(objects) $(LDPATH) $(LDLIBS) -o Power
 Mapper: source/Mapper.f90 $(objects)
 	$(FC) $(FFLAGS) source/Mapper.f90 $(objects) $(LDPATH) $(LDLIBS) -o Mapper
-MapsNz: source/MapsNz.f90 $(objects_MapsNz)
-	$(FC) $(FFLAGS) source/MapsNz.f90 $(objects_MapsNz) $(LDPATH) $(LDLIBS) -o MapsNz
+#MapsNz: source/MapsNz.f90 $(objects_MapsNz)
+#	$(FC) $(FFLAGS) source/MapsNz.f90 $(objects_MapsNz) $(LDPATH) $(LDLIBS) -o MapsNz
+MapsNz: source/MapsNz_V2.f90 $(objects_MapsNz)
+	$(FC) $(FFLAGS) source/MapsNz_V2.f90 $(objects_MapsNz) $(LDPATH) $(LDLIBS) -o MapsNz
 MapsCMBLenS: source/MapsCMBLenS.f90 $(objects)
 	$(FC) $(FFLAGS) source/MapsCMBLenS.f90 $(objects) $(LDPATH) $(LDLIBS) -o MapsCMBLenS
 QuickPower: source/QuickPower.f90 $(objects)
