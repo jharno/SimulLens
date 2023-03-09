@@ -126,7 +126,7 @@ program SimulLens
   character(len=7) z_string,index_str,newLOS_str,LOS_str,seed_fr,nodeID
   character(len=10) :: date,time,zone
   real InverseChi, z_tmp, mychi, chi_mean, z_mean
-  integer(4) nr_min, nr_max, nc_z
+  integer(4) nr_min, nr_max, nc_z, nc_z_orig
 
   !-------- Multi-plateform code. For projection maps :
   ! in/output_form =  TCS: 'unformatted' ; GPC: 'binary'
@@ -866,8 +866,9 @@ program SimulLens
         !--------------
         !Read the files
         !if(z_write(j) .lt. 3.1 .and. input_form=='sequential')read(fu) ScaleFactor
+        read(fu) nc_z_orig
         read(fu) nc_z
-        write(*,*) 'Read nc_z', nc_z
+        write(*,*) 'Read nc_z and nc_z_orig', nc_z, nc_z_orig
         allocate(input_map(nc_z,nc_z), zoom_map(2*nc_z,2*nc_z))
 #ifdef calshear
         allocate(map_cplx(nc_z,nc_z),phi(nc_z,nc_z), tmp_map(nc_z,nc_z))
@@ -2414,7 +2415,7 @@ program SimulLens
 
 
         !call zoomshiftmap_nodefl(input_map,map_3D(:,:,j),zoom_map,nc_z,npc,shift,frac)
-        call zoomshiftmap_nodefl(input_map,map_3D(:,:,j),zoom_map,nc_z,npc,shift,1.0)
+        call zoomshiftmap_nodefl(input_map,map_3D(:,:,j),zoom_map,nc_z,npc,shift,real(nc_z,kind=4)/real(nc_z_orig,kind=4))
         write(*,*)'delta mean,min,max:' , sum(map_3D(:,:,j)/nc_z/nc_z), minval(map_3D(:,:,j)),maxval(map_3D(:,:,j)) 
         !write(*,*) map_3D(1:10,1:10,j)
         !pause
@@ -3132,11 +3133,13 @@ end program SimulLens
     map2=0
     !frac1=n1*frac/n2
     ! no interpolation!
-    frac1=1.0
+    !frac1=1.0
+    ! with interpolation!
+    frac1=frac
 
-    !write(*,*) '***************'
-    !write(*,*) 'frac = ',frac,frac1 
-    !write(*,*) '***************'
+    write(*,*) '***************'
+    write(*,*) 'frac = ',frac,frac1 
+    write(*,*) '***************'
     !pause
 
     !$ call omp_set_num_threads(24)
@@ -3151,7 +3154,7 @@ end program SimulLens
           ib=modulo(ib-1,2*n1)+1
           jp=modulo(jb,2*n1)+1
           ip=modulo(ib,2*n1)+1
-          !write(*,*)'ip,j2, jp, j2:', ip, i2, jp, j2
+          !write(*,*)'ip,i2,jp,j2,w,w2,frac:', ip, i2, jp, j2, w1, w2, frac
           !pause
           map2(i2,j2)=tmp(ip,jp)*w1*w2+tmp(ip,jb)*w1*(1-w2)+&
                           tmp(ib,jp)*(1-w1)*w2+tmp(ib,jb)*(1-w1)*(1-w2)

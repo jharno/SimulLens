@@ -19,7 +19,7 @@ real, parameter :: Area= 100.0 ! in sq. deg.
 integer, parameter :: nslice=26 
 real, parameter :: zs=2.7 ! Not used anymore
 integer, parameter :: nc=2048 
-integer, parameter :: npc= 512
+integer, parameter :: npc= 128
 !------------------------------
 !Internal parameters:
 integer, parameter :: nslice_close=20
