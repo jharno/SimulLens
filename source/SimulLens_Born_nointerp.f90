@@ -872,6 +872,7 @@ program SimulLens
         allocate(input_map(nc_z,nc_z), zoom_map(2*nc_z,2*nc_z))
 #ifdef calshear
         allocate(map_cplx(nc_z,nc_z),phi(nc_z,nc_z), tmp_map(nc_z,nc_z))
+        allocate(shear(nc_z,nc_z))
 #endif
         write(*,*) 'Allocated memory!'
         read(fu)  input_map ! rho_pxy_close
@@ -2480,7 +2481,7 @@ program SimulLens
 !        write(*,*) '******TEST: incrementing rotation every two steps...'
         deallocate(input_map, zoom_map)
 #ifdef calshear
-        deallocate(map_cplx,phi,tmp_map)
+        deallocate(map_cplx,phi,tmp_map, shear)
 #endif
         write(*,*) "Deallocated memory"
      enddo !!j=1,nslice
@@ -3133,9 +3134,9 @@ end program SimulLens
     map2=0
     !frac1=n1*frac/n2
     ! no interpolation!
-    !frac1=1.0
+    frac1=1.0
     ! with interpolation!
-    frac1=frac
+    !frac1=frac
 
     write(*,*) '***************'
     write(*,*) 'frac = ',frac,frac1 
