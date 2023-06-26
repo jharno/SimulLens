@@ -2432,12 +2432,12 @@ program SimulLens
           tmp_map = shear%p
           !call zoomshiftmap(tmp_map,newshear(:,:,j)%p,zoom_map, nc,npc,shift,0.0,frac)
           !call zoomshiftmap_nodefl(tmp_map,newshear(:,:,j)%p,zoom_map, nc_z,npc,shift,frac)
-          call zoomshiftmap_nodefl(tmp_map,newshear(:,:,j)%p,zoom_map, nc_z,npc,shift,1.0)
+          call zoomshiftmap_nodefl(tmp_map,newshear(:,:,j)%p,zoom_map, nc_z,npc,shift,real(nc_z,kind=4)/real(nc_z_orig,kind=4))
 
           tmp_map = shear%c
           !call zoomshiftmap(tmp_map,newshear(:,:,j)%c,zoom_map, nc,npc,shift,0.0,frac)
           !call zoomshiftmap_nodefl(tmp_map,newshear(:,:,j)%c,zoom_map, nc_z,npc,shift,frac)
-          call zoomshiftmap_nodefl(tmp_map,newshear(:,:,j)%c,zoom_map, nc_z,npc,shift,1.0)
+          call zoomshiftmap_nodefl(tmp_map,newshear(:,:,j)%c,zoom_map, nc_z,npc,shift,real(nc_z,kind=4)/real(nc_z_orig,kind=4))
           !call zoomshiftmap(shear%p,newshear(:,:,j)%p,zoom_map, nc,npc,shift,CorrBornDefl,frac)
           !call zoomshiftmap(shear%c,newshear(:,:,j)%c,zoom_map, nc,npc,shift,CorrBornDefl,frac)
 
