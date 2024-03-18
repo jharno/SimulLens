@@ -2334,7 +2334,7 @@ if(i.eq.2)fp=fn(1:len_trim(fn))//'proj_xz.dat'
         ! grid to have a mean of 1.0. Then find the mean of the projection:
         !input_map(:,:) = input_map(:,:)*8.0*(real(nc,kind=4)/384.0)**2
         !input_map(:,:) = input_map(:,:)*(real(nc_z_orig,kind=4)/384.0)**3
-        input_map(:,:) = input_map(:,:)*(real(nc_z_orig,kind=4)/384.0)**2
+        input_map(:,:) = input_map(:,:)*(real(nc_z_orig,kind=4)/384.0)**2*1.063
         rhomean=sum(real(input_map(:,:),kind=8))/nc_z/nc_z 
         write(*,*) 'Mean before subtraction= ',rhomean
 
