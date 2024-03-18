@@ -707,87 +707,88 @@ program SimulLens
                   fn1=''
               endif
 
-              open(100,file=trim(seed_dir)//"random_shift_subvol_LOS"//trim(LOS_str)//trim(fn1), status='old',position='asis')
-              ! Sloppy way to get the right entry number
-              do j2= 1,j          
-                 read(100,*) shift%x, shift%y, rand_subvol
-              enddo           
-              close(100)
+      open(100,file=trim(seed_dir)//"random_shift_subvol_LOS"//trim(fn1), status='old',position='asis')
+      ! Sloppy way to get the right entry number
+      do j2= 1,j          
+	 read(100,*) shift%x, shift%y, rand_subvol
+      enddo           
+      close(100)
 
-              write(*,*) 'Read random shift and subvolume from file, rand_subvol =', rand_subvol
-           endif
+      write(*,*) 'Read random shift and subvolume from file, rand_subvol =', rand_subvol
+   endif
 
-           if(rand_subvol<(1.0/6.0)) then 
-              !fp=fn(1:len_trim(fn))//'proj_half_finer_xy_f.dat'
-              !fp=fn(1:len_trim(fn))//'projection_xy_f_snap_'//trim(z_string)//'_Seed_'//trim(seed_fr)//'_Node_'//trim(nodeID)//'.unf'
-              !fp=fn(1:len_trim(fn))//'projection_xy_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_hr.unf'
-              !fp=fn(1:len_trim(fn))//'projection_xy_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_2.unf'
-              !fp=fn(1:len_trim(fn))//'projection_xy_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_4.unf'
-              fp=fn(1:len_trim(fn))//'projection_xy_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'.unf'
-           elseif(rand_subvol<(2.0/6.0)) then
-              !fp=fn(1:len_trim(fn))//'proj_half_finer_yz_f.dat'
-              !fp=fn(1:len_trim(fn))//'projection_yz_f_snap_'//trim(z_string)//'_Seed_'//trim(seed_fr)//'_Node_'//trim(nodeID)//'.unf' 
-              !fp=fn(1:len_trim(fn))//'projection_yz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_hr.unf' 
-              !fp=fn(1:len_trim(fn))//'projection_yz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_2.unf' 
-              !fp=fn(1:len_trim(fn))//'projection_yz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_4.unf' 
-              fp=fn(1:len_trim(fn))//'projection_yz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'.unf' 
-           elseif(rand_subvol<(3.0/6.0)) then 
-              !fp=fn(1:len_trim(fn))//'proj_half_finer_xz_f.dat'
-              !fp=fn(1:len_trim(fn))//'projection_xz_f_snap_'//trim(z_string)//'_Seed_'//trim(seed_fr)//'_Node_'//trim(nodeID)//'.unf'
-              !fp=fn(1:len_trim(fn))//'projection_xz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_hr.unf'
-              !fp=fn(1:len_trim(fn))//'projection_xz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_2.unf'
-              !fp=fn(1:len_trim(fn))//'projection_xz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_4.unf'
-              fp=fn(1:len_trim(fn))//'projection_xz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'.unf'
-           elseif(rand_subvol<(4.0/6.0)) then 
-              !fp=fn(1:len_trim(fn))//'proj_half_finer_xy_b.dat'
-              !fp=fn(1:len_trim(fn))//'projection_xy_b_snap_'//trim(z_string)//'_Seed_'//trim(seed_fr)//'_Node_'//trim(nodeID)//'.unf'
-              !fp=fn(1:len_trim(fn))//'projection_xy_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_hr.unf'
-              !fp=fn(1:len_trim(fn))//'projection_xy_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_2.unf'
-              !fp=fn(1:len_trim(fn))//'projection_xy_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_4.unf'
-              fp=fn(1:len_trim(fn))//'projection_xy_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'.unf'
-           elseif(rand_subvol<(5.0/6.0)) then
-              !fp=fn(1:len_trim(fn))//'proj_half_finer_yz_b.dat'
-              !fp=fn(1:len_trim(fn))//'projection_yz_b_snap_'//trim(z_string)//'_Seed_'//trim(seed_fr)//'_Node_'//trim(nodeID)//'.unf'
-              !fp=fn(1:len_trim(fn))//'projection_yz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_hr.unf'
-              !fp=fn(1:len_trim(fn))//'projection_yz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_2.unf'
-              !fp=fn(1:len_trim(fn))//'projection_yz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_4.unf'
-              fp=fn(1:len_trim(fn))//'projection_yz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'.unf'
-           else
-              !fp=fn(1:len_trim(fn))//'proj_half_finer_xz_b.dat'
-              !fp=fn(1:len_trim(fn))//'projection_xz_b_snap_'//trim(z_string)//'_Seed_'//trim(seed_fr)//'_Node_'//trim(nodeID)//'.unf'
-              !fp=fn(1:len_trim(fn))//'projection_xz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_hr.unf'
-              !fp=fn(1:len_trim(fn))//'projection_xz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_2.unf'
-              !fp=fn(1:len_trim(fn))//'projection_xz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_4.unf'
-              fp=fn(1:len_trim(fn))//'projection_xz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'.unf'
-           endif
-        else
-           write (fn1,'("_cone", i1)') 1
-           !if(i.eq.0)fp=fn(1:len_trim(fn))//'proj_half_finer_xy_f.dat'
-           !if(i.eq.1)fp=fn(1:len_trim(fn))//'proj_half_finer_yz_f.dat'
-           !if(i.eq.2)fp=fn(1:len_trim(fn))//'proj_half_finer_xz_f.dat'
-           if(i.eq.0)fp=fn(1:len_trim(fn))//'projection_xy_f_snap_'//trim(z_string)//'_Seed_'//trim(seed_fr)//'_Node_'//trim(nodeID)//'.unf'
-           if(i.eq.1)fp=fn(1:len_trim(fn))//'projection_yz_f_snap_'//trim(z_string)//'_Seed_'//trim(seed_fr)//'_Node_'//trim(nodeID)//'.unf'
-           if(i.eq.2)fp=fn(1:len_trim(fn))//'projection_xz_f_snap_'//trim(z_string)//'_Seed_'//trim(seed_fr)//'_Node_'//trim(nodeID)//'.unf'
-        endif
+   if(rand_subvol<(1.0/6.0)) then 
+      !fp=fn(1:len_trim(fn))//'proj_half_finer_xy_f.dat'
+      !fp=fn(1:len_trim(fn))//'projection_xy_f_snap_'//trim(z_string)//'_Seed_'//trim(seed_fr)//'_Node_'//trim(nodeID)//'.unf'
+      !fp=fn(1:len_trim(fn))//'projection_xy_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_hr.unf'
+      !fp=fn(1:len_trim(fn))//'projection_xy_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_2.unf'
+      !fp=fn(1:len_trim(fn))//'projection_xy_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_4.unf'
+      fp=fn(1:len_trim(fn))//'projection_xy_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_ncone'//trim(LOS_str)//'.unf'
+   elseif(rand_subvol<(2.0/6.0)) then
+      !fp=fn(1:len_trim(fn))//'proj_half_finer_yz_f.dat'
+      !fp=fn(1:len_trim(fn))//'projection_yz_f_snap_'//trim(z_string)//'_Seed_'//trim(seed_fr)//'_Node_'//trim(nodeID)//'.unf' 
+      !fp=fn(1:len_trim(fn))//'projection_yz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_hr.unf' 
+      !fp=fn(1:len_trim(fn))//'projection_yz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_2.unf' 
+      !fp=fn(1:len_trim(fn))//'projection_yz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_4.unf' 
+      !fp=fn(1:len_trim(fn))//'projection_yz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'.unf' 
+      fp=fn(1:len_trim(fn))//'projection_yz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_ncone'//trim(LOS_str)//'.unf' 
+   elseif(rand_subvol<(3.0/6.0)) then 
+      !fp=fn(1:len_trim(fn))//'proj_half_finer_xz_f.dat'
+      !fp=fn(1:len_trim(fn))//'projection_xz_f_snap_'//trim(z_string)//'_Seed_'//trim(seed_fr)//'_Node_'//trim(nodeID)//'.unf'
+      !fp=fn(1:len_trim(fn))//'projection_xz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_hr.unf'
+      !fp=fn(1:len_trim(fn))//'projection_xz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_2.unf'
+      !fp=fn(1:len_trim(fn))//'projection_xz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_4.unf'
+      fp=fn(1:len_trim(fn))//'projection_xz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_ncone'//trim(LOS_str)//'.unf'
+   elseif(rand_subvol<(4.0/6.0)) then 
+      !fp=fn(1:len_trim(fn))//'proj_half_finer_xy_b.dat'
+      !fp=fn(1:len_trim(fn))//'projection_xy_b_snap_'//trim(z_string)//'_Seed_'//trim(seed_fr)//'_Node_'//trim(nodeID)//'.unf'
+      !fp=fn(1:len_trim(fn))//'projection_xy_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_hr.unf'
+      !fp=fn(1:len_trim(fn))//'projection_xy_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_2.unf'
+      !fp=fn(1:len_trim(fn))//'projection_xy_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_4.unf'
+      fp=fn(1:len_trim(fn))//'projection_xy_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_ncone'//trim(LOS_str)//'.unf'
+   elseif(rand_subvol<(5.0/6.0)) then
+      !fp=fn(1:len_trim(fn))//'proj_half_finer_yz_b.dat'
+      !fp=fn(1:len_trim(fn))//'projection_yz_b_snap_'//trim(z_string)//'_Seed_'//trim(seed_fr)//'_Node_'//trim(nodeID)//'.unf'
+      !fp=fn(1:len_trim(fn))//'projection_yz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_hr.unf'
+      !fp=fn(1:len_trim(fn))//'projection_yz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_2.unf'
+      !fp=fn(1:len_trim(fn))//'projection_yz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_4.unf'
+      fp=fn(1:len_trim(fn))//'projection_yz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_ncone'//trim(LOS_str)//'.unf'
+   else
+      !fp=fn(1:len_trim(fn))//'proj_half_finer_xz_b.dat'
+      !fp=fn(1:len_trim(fn))//'projection_xz_b_snap_'//trim(z_string)//'_Seed_'//trim(seed_fr)//'_Node_'//trim(nodeID)//'.unf'
+      !fp=fn(1:len_trim(fn))//'projection_xz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_hr.unf'
+      !fp=fn(1:len_trim(fn))//'projection_xz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_2.unf'
+      !fp=fn(1:len_trim(fn))//'projection_xz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_4096_4.unf'
+      fp=fn(1:len_trim(fn))//'projection_xz_snap_'//trim(z_string)//'_Node_'//trim(nodeID)//'_ncone'//trim(LOS_str)//'.unf'
+   endif
+else
+   write (fn1,'("_cone", i1)') 1
+   !if(i.eq.0)fp=fn(1:len_trim(fn))//'proj_half_finer_xy_f.dat'
+   !if(i.eq.1)fp=fn(1:len_trim(fn))//'proj_half_finer_yz_f.dat'
+   !if(i.eq.2)fp=fn(1:len_trim(fn))//'proj_half_finer_xz_f.dat'
+   if(i.eq.0)fp=fn(1:len_trim(fn))//'projection_xy_f_snap_'//trim(z_string)//'_Seed_'//trim(seed_fr)//'_Node_'//trim(nodeID)//'.unf'
+   if(i.eq.1)fp=fn(1:len_trim(fn))//'projection_yz_f_snap_'//trim(z_string)//'_Seed_'//trim(seed_fr)//'_Node_'//trim(nodeID)//'.unf'
+   if(i.eq.2)fp=fn(1:len_trim(fn))//'projection_xz_f_snap_'//trim(z_string)//'_Seed_'//trim(seed_fr)//'_Node_'//trim(nodeID)//'.unf'
+endif
 #endif
 
 
-        !-----------
-        ! For nuSLICS : 
+!-----------
+! For nuSLICS : 
 #ifdef NEUTRINOS
-        if(i.eq.0)fp=fn(1:len_trim(fn))//'proj_xy.dat'
-        if(i.eq.1)fp=fn(1:len_trim(fn))//'proj_yz.dat'
-        if(i.eq.2)fp=fn(1:len_trim(fn))//'proj_xz.dat'
+if(i.eq.0)fp=fn(1:len_trim(fn))//'proj_xy.dat'
+if(i.eq.1)fp=fn(1:len_trim(fn))//'proj_yz.dat'
+if(i.eq.2)fp=fn(1:len_trim(fn))//'proj_xz.dat'
 #endif
-        !-----------
-        ! For SLICS recycling :
-        !call random_number(random_rot)
+!-----------
+! For SLICS recycling :
+!call random_number(random_rot)
 
-        !if(random_rot<0.33333) i=0
-        !if(random_rot>=0.33333 .and. random_rot < 0.66666) i=1
-        !if(random_rot>0.66666) i=2
+!if(random_rot<0.33333) i=0
+!if(random_rot>=0.33333 .and. random_rot < 0.66666) i=1
+!if(random_rot>0.66666) i=2
 
-        !if(i.eq.0)fp=fn(1:len_trim(fn))//'proj_half_finer_xy.dat_LOS'//trim(LOS_str)
+!if(i.eq.0)fp=fn(1:len_trim(fn))//'proj_half_finer_xy.dat_LOS'//trim(LOS_str)
         !if(i.eq.1)fp=fn(1:len_trim(fn))//'proj_half_finer_yz.dat_LOS'//trim(LOS_str)
         !if(i.eq.2)fp=fn(1:len_trim(fn))//'proj_half_finer_xz.dat_LOS'//trim(LOS_str)
 
@@ -2332,7 +2333,8 @@ program SimulLens
         ! Go from particle count map to projected density map, requiring the 3D
         ! grid to have a mean of 1.0. Then find the mean of the projection:
         !input_map(:,:) = input_map(:,:)*8.0*(real(nc,kind=4)/384.0)**2
-        input_map(:,:) = input_map(:,:)*(real(nc_z,kind=4)/384.0)**3
+        !input_map(:,:) = input_map(:,:)*(real(nc_z_orig,kind=4)/384.0)**3
+        input_map(:,:) = input_map(:,:)*(real(nc_z_orig,kind=4)/384.0)**2
         rhomean=sum(real(input_map(:,:),kind=8))/nc_z/nc_z 
         write(*,*) 'Mean before subtraction= ',rhomean
 
@@ -2416,7 +2418,11 @@ program SimulLens
 
 
         !call zoomshiftmap_nodefl(input_map,map_3D(:,:,j),zoom_map,nc_z,npc,shift,frac)
-        call zoomshiftmap_nodefl(input_map,map_3D(:,:,j),zoom_map,nc_z,npc,shift,real(nc_z,kind=4)/real(nc_z_orig,kind=4))
+        !call zoomshiftmap_nodefl(input_map,map_3D(:,:,j),zoom_map,nc_z,npc,shift,real(nc_z,kind=4)/real(nc_z_orig,kind=4))
+
+        !no interpolation
+        map_3D(:,:,j) = input_map
+
         write(*,*)'delta mean,min,max:' , sum(map_3D(:,:,j)/nc_z/nc_z), minval(map_3D(:,:,j)),maxval(map_3D(:,:,j)) 
         !write(*,*) map_3D(1:10,1:10,j)
         !pause
@@ -2505,7 +2511,7 @@ program SimulLens
      !do i=8,8 ! z_l = 0.525
      !do i=16,16 ! z_l = 0.221
 
-     ! do only a gfew?
+     ! do only a few?
        !if(i.ne.1 .and. i.ne.23) cycle
        !if( i.ne.23) cycle
 
